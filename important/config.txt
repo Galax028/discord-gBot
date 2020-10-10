@@ -1,0 +1,27 @@
+------------------------------------------------------------------------------
+Running Token:
+NzQyNzI4MTM3MTM3NDU1MTI1.XzKVew.fmQ_HE7I-PqNmTwwwwPl6UyPJlI
+
+Real Token:
+NzQyNzI4MTM3MTM3NDU1MTI1.XzKVew.fmQ_HE7I-PqNmTwwwwPl6UyPJlI
+
+Pre-Build Token:
+NzQzMTAyNzU0OTM1MDEzMzk3.XzPyXg.dfiMPzVfl_VV1Q5GBCjOVDQm4nI
+------------------------------------------------------------------------------
+Latest Version:
+1.2.2
+
+Pre-Build Version:
+pre1.3.0a
+
+How to Version:
+X.Y.Z
+X = Very big update
+Y = Updates
+Z = Bug fixes, etc.,
+
+How to Pre-Build Version:
+preX.Y.ZNaN
+X, Y and Z =The same as normal
+NaN = Alphabet a - z for each modification/fix for that pre-build version
+------------------------------------------------------------------------------
