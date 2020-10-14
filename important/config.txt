@@ -9,10 +9,10 @@ Pre-Build Token:
 NzQzMTAyNzU0OTM1MDEzMzk3.XzPyXg.dfiMPzVfl_VV1Q5GBCjOVDQm4nI
 ------------------------------------------------------------------------------
 Latest Version:
-1.2.2
+1.3.0
 
 Pre-Build Version:
-pre1.3.0a
+pre1.3.1a
 
 How to Version:
 X.Y.Z

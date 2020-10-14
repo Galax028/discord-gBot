@@ -29,11 +29,6 @@ class fun(commands.Cog):
         await ctx.send(embed=embed)
         print(f"Log/funcmd.py: {ctx.message.author} has executed the command: _8ball")
 
-    @_8ball.error
-    async def _8ball_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('Please provide a question!')
-
     @commands.command()
     async def tosscoin(self, ctx, *, guess):
         responses = ['It is head!','It is tails!']
@@ -41,11 +36,6 @@ class fun(commands.Cog):
         embed.add_field(name=f'Your guess: {guess}', value=f'Result: {random.choice(responses)}')
         await ctx.send(embed=embed)
         print(f"Log/funcmd.py: {ctx.message.author} has executed the command: tosscoin")
-
-    @tosscoin.error
-    async def tosscoin_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('Please provide your guess!')
 
     @commands.command()
     async def space(self, ctx):
@@ -79,11 +69,6 @@ class fun(commands.Cog):
         await ctx.send(f"{ctx.message.author.mention} has kicked {member.mention}'s ass and dealt `{random.choice(responses)}` damage!")
         print(f"Log/funcmd.py: {ctx.message.author} has executed the command: kickass")
 
-    @kickass.error
-    async def kickass_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('You want me to kick your ass or something? Please tell me the user you want me to kick their ass!')
-
     @commands.command()
     async def sad(self, ctx):
         embed = discord.Embed(title='sad', colour=discord.Colour.blue())
@@ -105,6 +90,21 @@ class fun(commands.Cog):
                      f"*gunshots*   Oops, I missed all the shots, guess I'll stop being a hitman. By the way, I'm not giving you the refund {ctx.message.author.mention}, it's for the ammo cost."]
         await ctx.send(random.choice(responses))
         print(f"Log/funcmd.py: {ctx.message.author} has executed the command: kill")
+
+    @_8ball.error
+    async def _8ball_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send('Please provide a question!')
+
+    @tosscoin.error
+    async def tosscoin_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send('Please provide your guess!')
+
+    @kickass.error
+    async def kickass_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send('You want me to kick your ass or something? Please tell me the user you want me to kick their ass!')
 
     @kill.error
     async def kill_error(self, ctx, error):

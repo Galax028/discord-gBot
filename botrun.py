@@ -3,6 +3,7 @@
 import os
 import discord
 from discord.ext import commands
+from discord.ext.commands import CommandNotFound
 from time import time
 from datetime import datetime, timedelta
 from platform import python_version
@@ -42,14 +43,20 @@ elif token != prebuild:
 
 @bot.event
 async def on_ready():
-    print(f"{Fore.GREEN}[SETUP]botrun.py: gBot is now online.{Style.RESET_ALL}")
-    print(f"{Fore.GREEN}[SETUP]botrun.py: The latency is {int(bot.latency * 1000)} ms.{Style.RESET_ALL}")
+    print(f"{Fore.GREEN}[PRIORITY]botrun.py: gBot is now online.{Style.RESET_ALL}")
+    print(f"{Fore.GREEN}[PRIORITY]botrun.py: The latency is {int(bot.latency * 1000)} ms.{Style.RESET_ALL}")
     await bot.change_presence(status=discord.Status.online, activity=discord.Game(f'/gbothelp | v.{version}'))
 
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
-        print(f"{Fore.GREEN}[SETUP]botrun.py: Cog {filename} is now loaded.{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}[PRIORITY]botrun.py: Cog {filename} is now loaded.{Style.RESET_ALL}")
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, CommandNotFound):
+        return
+    raise error
 
 #gbotinfo is here because I need variables that I can't import because it doesn't fucking work
 @bot.command()
@@ -67,7 +74,7 @@ async def gbotinfo(ctx):
     fields = [("Developed by:", "Galax028#6669", True),
               ("Hosted using:", "https://cubes.host", True),
               ("Version:", f"{version}", True),
-              ("Total Commands:", "18", True),
+              ("Total Commands:", "23", True),
               ("Invite the bot:", "[Click Here](https://rb.gy/wzzuvm)", True),
               ("Support Server:", "[Click Here](https://discord.gg/2hVmdnb)", True),
               ("⠀","----------------------------------------------------------------------", False),
@@ -76,7 +83,7 @@ async def gbotinfo(ctx):
               ("⠀", "⠀", True),
               ("Uptime:", f"`{uptime}`", True),
               ("CPU Time:", f"`{cpu_time}`", True),
-              ("RAM Usage:", f"`{mem_usage:,.3f}/{mem_total:,.0f} MiB`", True),
+              ("RAM Usage:", f"`{mem_usage:,.3f}/256 MiB`", True),
               ("⠀","----------------------------------------------------------------------", False),
               ("Special Thanks:", "PixelEdition#2116, Rage Gamer#3000, Nickfowa#4646", False),
               ("⠀", "⠀", False)]

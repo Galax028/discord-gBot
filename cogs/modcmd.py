@@ -13,14 +13,10 @@ class mod(commands.Cog):
     async def clear(self, ctx, amount : int):
         amount = amount + 1
         await ctx.channel.purge(limit=amount)
+        notify = await ctx.send(f"Cleared `{amount-1}` messages.")
+        time.sleep(1)
+        await notify.delete()
         print(f"Log/modcmd.py: {ctx.message.author} has executed the command: clear")
-
-    @clear.error
-    async def clear_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('Please provide the number of messages you want to clear.')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("Sorry, but you don't have permissions to do that.")
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
@@ -36,13 +32,6 @@ class mod(commands.Cog):
         await ctx.send(f'{member.mention} has been muted. Reason: {reason}')
         print(f"Log/modcmd.py: {ctx.message.author} has executed the command: mute")
 
-    @mute.error
-    async def mute_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('Please tell me the person you want to mute.')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("Sorry, but you don't have permissions to do that.")
-
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def unmute(self, ctx, member : discord.Member):
@@ -51,13 +40,6 @@ class mod(commands.Cog):
         await ctx.send(f'{member.mention} has been unmuted.')
         print(f"Log/modcmd.py: {ctx.message.author} has executed the command: unmute")
 
-    @unmute.error
-    async def unmute_error(self, ctx,error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('Please tell me the person you want to unmute.')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("Sorry, but you don't have permissions to do that.")
-
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member : discord.Member, *, reason=None):
@@ -65,26 +47,12 @@ class mod(commands.Cog):
         await ctx.send(f'{member.mention} has beed kicked.')
         print(f"Log/modcmd.py: {ctx.message.author} has executed the command: kick")
 
-    @kick.error
-    async def kick_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('Please tell me the person you want to kick.')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("Sorry, but you don't have permissions to do that.")
-
     @commands.command()
     @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, member : discord.Member, *, reason=None):
         await member.ban(reason=reason)
         await ctx.send(f'{member.mention} has beed banned.')
         print(f"Log/modcmd.py: {ctx.message.author} has executed the command: ban")
-
-    @ban.error
-    async def ban_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('Please tell me the person you want to ban.')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("Sorry, but you don't have permissions to do that.")
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
@@ -100,6 +68,41 @@ class mod(commands.Cog):
             await ctx.send(f'{user.mention} has been unbanned.')
             print(f"Log/modcmd.py: {ctx.message.author} has executed the command: unban")
             return
+
+    @clear.error
+    async def clear_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send('Please provide the number of messages you want to clear.')
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("Sorry, but you don't have permissions to do that.")
+
+    @mute.error
+    async def mute_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send('Please tell me the person you want to mute.')
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("Sorry, but you don't have permissions to do that.")
+
+    @unmute.error
+    async def unmute_error(self, ctx,error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send('Please tell me the person you want to unmute.')
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("Sorry, but you don't have permissions to do that.")
+
+    @kick.error
+    async def kick_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send('Please tell me the person you want to kick.')
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("Sorry, but you don't have permissions to do that.")
+
+    @ban.error
+    async def ban_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send('Please tell me the person you want to ban.')
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("Sorry, but you don't have permissions to do that.")
 
     @unban.error
     async def unban_error(self, ctx, error):
