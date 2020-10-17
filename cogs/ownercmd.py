@@ -28,7 +28,6 @@ class owner(commands.Cog):
         self.bot_task = self.bot.loop.create_task(password_randomizer())
 
     @commands.command()
-    @commands.is_owner()
     async def reqtoken(self, ctx):
         await ctx.send("Please type in the password. (`15s timeout`)")
         print(f"Log/ownercmd.py: {ctx.message.author} has executed the command: reqtoken")

