@@ -2,3 +2,6 @@ __pycache__
 .vscode
 config.txt
 json_data/
+
+.eslintrc.json
+config.json

@@ -17,7 +17,7 @@ async def password_randomizer():
     while True:
         global password
         genpass = [random.randint(0,9),random.randint(0,9),random.randint(0,9),random.randint(0,9),random.randint(0,9)]
-        password = str(genpass).strip("[]'").replace( ', ' ,'' )
+        password = str(genpass).strip("[]'").replace(', ', '')
         print(f"{Fore.BLUE}[PRIORITY]ownercmd.py: The new password for /reqtoken is '{password}'.{Style.RESET_ALL}")
         await asyncio.sleep(1800)
 

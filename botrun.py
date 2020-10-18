@@ -1,6 +1,7 @@
 #DO NOT FORGET TO CHANGE TOKEN BEFORE UPLOADING
 
 import os
+import json
 import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
@@ -41,6 +42,18 @@ if token == prebuild:
 elif token != prebuild:
     version = read_version()
 
+def read_jsversion():
+    with open('./important/config.json', 'r') as f:
+        lines = f.readlines()
+        return lines[3].replace(""""version": """, '')
+jsversion = read_jsversion()
+
+def read_pyversion():
+    with open('./important/config.txt', 'r') as f:
+        lines = f.readlines()
+        return lines[17].strip()
+pyversion = read_pyversion()
+
 @bot.event
 async def on_ready():
     print(f"{Fore.GREEN}[PRIORITY]botrun.py: gBot is now online.{Style.RESET_ALL}")
@@ -73,8 +86,8 @@ async def gbotinfo(ctx):
 
     fields = [("Developed by:", "Galax028#6669", True),
               ("Hosted using:", "https://cubes.host", True),
-              ("Version:", f"{version}", True),
-              ("Total Commands:", "23", True),
+              ("Version:", f"Main: {version}\nPY: {pyversion}\nJS: {jsversion}", True),
+              ("Total Commands:", "31", True),
               ("Invite the bot:", "[Click Here](https://rb.gy/wzzuvm)", True),
               ("Support Server:", "[Click Here](https://discord.gg/2hVmdnb)", True),
               ("⠀","----------------------------------------------------------------------", False),

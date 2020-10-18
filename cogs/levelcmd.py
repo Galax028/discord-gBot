@@ -2,6 +2,13 @@ import discord
 from discord.ext import commands
 import json
 import random
+import asyncio
+
+def read_json():
+    with open ("./json_data/levels.json", 'r') as f:
+        json_ctx = f.readlines()
+        return ' '.join(json_ctx)
+bruh = read_json()
 
 class level(commands.Cog):
 
@@ -51,12 +58,6 @@ class level(commands.Cog):
             users[f'{user.id}']['level'] = lvl_end
             await message.channel.send(f'{user.mention} has leveled up to level {lvl_end}!')
 
-    async def read_json(self):
-        global json_ctx
-        with open ("./json_data/levels.json", 'r') as f:
-            json_ctx = f.readlines()
-            return ' '.join(json_ctx)
-
     @commands.command()
     async def level(self, ctx):
             await ctx.send(f'Your level is `{lvl_end}` and your experience is `{experience}`.')
@@ -64,7 +65,7 @@ class level(commands.Cog):
 
     @commands.command()
     async def readjson(self, ctx):
-        await ctx.send(f'```json\n{json_ctx}\n```')
+        await ctx.send(f'```json\n{bruh}\n```')
         print(f"Log/levelcmd.py: {ctx.message.author} has executed the command: readjson")
 
 def setup(bot):
