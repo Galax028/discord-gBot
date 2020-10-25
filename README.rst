@@ -5,4 +5,4 @@ discord-gBot
    :target: https://discord.gg/2hVmdnb
    :alt: Support Discord Server Invite Link
 
-A discord bot named "gBot" made using `discord.py` and a little bit of `discord.js`.
+A discord bot named "gBot" made using ``discord.py`` and a little bit of ``discord.js``.
