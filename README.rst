@@ -21,5 +21,7 @@ Useful Links
 - `Invite the Bot <https://rb.gy/wzzuvm>`_
 - `gBot's Support Server <https://discord.gg/2hVmdnb>`_
 
------
-**Made with love by, Galax028**
+~~~~~
+
+Made with love by, Galax028
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
