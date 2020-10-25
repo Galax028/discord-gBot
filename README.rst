@@ -23,4 +23,4 @@ Useful Links
 
 -----
 
-Made with love by, Galax028
+**Made with love by, Galax028**
