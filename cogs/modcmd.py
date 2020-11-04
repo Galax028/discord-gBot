@@ -1,7 +1,9 @@
+import time
+from datetime import datetime
+
 import discord
 from discord.ext import commands
-from datetime import datetime
-import time
+
 
 class mod(commands.Cog):
 

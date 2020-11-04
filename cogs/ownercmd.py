@@ -1,17 +1,13 @@
-import os
-import discord
-from discord.ext import commands
-from colorama import Fore, Style
-import random
 import asyncio
+import os
+import random
 import time
 
-def read_token():
-    with open('./important/config.txt', 'r') as f:
-        lines = f.readlines()
-        return lines[2].strip()
+import discord
+from colorama import Fore, Style
+from discord.ext import commands
+from important.modules import token
 
-token = read_token()
 
 async def password_randomizer():
     while True:
@@ -42,7 +38,7 @@ class owner(commands.Cog):
     async def load(self, ctx, *, cog: str):
         try:
             self.bot.load_extension(f"cogs.{cog[:-3]}")
-        except Exception as e:
+        except Exception:
             await ctx.send(f"An error occurred while trying to load the cog `{cog}`.")
             print(f"{Fore.RED}[PRIORITY]ownercmd.py: Failed to load cog {cog}.{Style.RESET_ALL}")
         else:
@@ -54,7 +50,7 @@ class owner(commands.Cog):
     async def unload(self, ctx, *, cog: str):
         try:
             self.bot.unload_extension(f"cogs.{cog[:-3]}")
-        except Exception as e:
+        except Exception:
             await ctx.send(f"An error occurred while trying to unload the cog `{cog}`.")
             print(f"{Fore.RED}[PRIORITY]ownercmd.py: Failed to unload cog {cog}.{Style.RESET_ALL}")
         else:
@@ -67,7 +63,7 @@ class owner(commands.Cog):
         try:
             self.bot.unload_extension(f"cogs.{cog[:-3]}")
             self.bot.load_extension(f"cogs.{cog[:-3]}")
-        except Exception as e:
+        except Exception:
             await ctx.send(f"An error occurred while trying to reload the cog `{cog}`.")
             print(f"{Fore.RED}[PRIORITY]ownercmd.py: Failed to reload cog {cog}.{Style.RESET_ALL}")
         else:

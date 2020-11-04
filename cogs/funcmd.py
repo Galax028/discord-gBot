@@ -1,8 +1,10 @@
-import discord
-from discord.ext import commands
 import random
 import time
 from datetime import datetime
+
+import discord
+from discord.ext import commands
+
 
 class fun(commands.Cog):
 
