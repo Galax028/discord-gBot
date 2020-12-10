@@ -72,8 +72,8 @@ class info(commands.Cog):
         page3 = discord.Embed(title='gBot update Log - 1.0.0 to 1.3.0',
                               description="Version 1.0.0 - 1.0.3:\n- updatelog command\n- gbothelp command renovated\n- kickass command\n- space command\n- Bug fixes\n- mute command rewamp\n- kill command\n\nVersion 1.1.0 - 1.1.3:\n- gBot now uses cogs\n- UI improvements\n- wtodo command added\n- rtodo command added\n\nVersion 1.2.0 - 1.2.4:\n- gbotinfo command rewamp\n- New GitHub repository\n- Version detection\n- clear command additions\n- Code cleanup\n\nVersion 1.3.0:\n- load command\n- unload command\n- reload command\n- shutdown command\n- reqtoken command\n\n`Page 2 out of 3`",
                               colour=discord.Colour.blurple())
-        page4 = discord.Embed(title='gBot Update Log - 2.0.0 to 2.0.1',
-                              description="Version 2.0.0 - 2.0.2:\n- Music system\n- join command\n- play command\n- pause command\n- resume command\n- skip commmand\n- clearqueue command\n- stop command\n- disconnect command\n- Code cleanup\n\n`Page 3 out of 3`")
+        page4 = discord.Embed(title='gBot Update Log - 2.0.0 to 2.x.x',
+                              description="Version 2.0.0 - 2.0.3:\n- Music system\n- join command\n- play command\n- pause command\n- resume command\n- skip commmand\n- clearqueue command\n- stop command\n- disconnect command\n- Code cleanup\n\n`Page 3 out of 3`")
 
         contents = [page1, page2, page3, page4]
         pages = 4
@@ -122,14 +122,11 @@ class info(commands.Cog):
                               description='clear <amount> - gBot will clear messages.\nmute <user> <reason> - gBot will mute a user.\nunmute <user> - gBot will unmute a user.\nkick <user> <reason> - gBot will kick a user.\nban <user> <reason> - gBot will ban a user.\nunban <banned user> - gBot will unban a user.\n\n`Page 3 out of 5`',
                               colour=discord.Colour.blurple())
         page5 = discord.Embed(title='Music Commands',
-                              description="join - gBot will join the voice channel that you're in.\n-play <YouTube URL> - gBot will play a song from youtube.\npause - gBot will pause the song.\nresume - gBot will resume the song.\nskip - gBot will skip the song.\nstop - gBot will stop playing songs.\nclearqueue - gBot will claer the music queue.\ndisconnect - gBot will disconnect from the voice channel\n\n`Page 4 out of 5`",
-                              colour=discord.Colour.blurple())
-        page6 = discord.Embed(title='Special Commands',
-                              description="reqtoken - Request gBot's token.\nload <cog> - Load a cog.\nunload <cog> - Unload a cog.\nreload <cog> - Reload a cog.\nshutdown - Shutdown gBot.\n\n`Page 5 out of 5`",
+                              description="join - gBot will join the voice channel that you're in.\nplay <YouTube URL> - gBot will play a song from youtube.\npause - gBot will pause the song.\nresume - gBot will resume the song.\nskip - gBot will skip the song.\nstop - gBot will stop playing songs.\nclearqueue - gBot will claer the music queue.\ndisconnect - gBot will disconnect from the voice channel\n\n`Page 4 out of 5`",
                               colour=discord.Colour.blurple())
 
-        contents = [page1, page2, page3, page4, page5, page6]
-        pages = 6
+        contents = [page1, page2, page3, page4, page5]
+        pages = 5
         cur_page = 1
         message = await ctx.send(embed=(contents[cur_page-1]))
         print(f"Log/infocmd.py: {ctx.message.author} has executed the command: gbothelp")

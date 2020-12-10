@@ -1,3 +1,4 @@
+# pylint: disable-all
 #DO NOT FORGET TO CHANGE TOKEN BEFORE UPLOADING
 
 import json
@@ -29,7 +30,6 @@ for filename in os.listdir('discord-gBot/cogs'):
 async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound):
         return
-    raise error
 
 #Bot Initialize
 bot.run(token)
