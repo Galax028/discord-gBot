@@ -40,7 +40,7 @@ class info(commands.Cog):
             mem_usage = mem_total * (mem_of_total / 100)
 
         fields = [("Developed by:", "Galax028#6669", True),
-                  ("Hosted using:", "https://cubes.host", True),
+                  ("Hosted using:", "https://mydiscordbothosting.com", True),
                   ("Version:", f"Main: {version}\nPY: {pyversion}\nJS: {jsversion}", True),
                   ("Total Commands:", "31", True),
                   ("Invite the bot:", "[Click Here](https://rb.gy/wzzuvm)", True),
@@ -110,7 +110,7 @@ class info(commands.Cog):
     @commands.command()
     async def gbothelp(self, ctx):
         page1 = discord.Embed(title='gBot Help - Contents',
-                              description='Info Commands - Page 1\nFun Commands - Page 2\nModeration Commands - Page 3\nMusic Commands - Page 4\nSpecial Commands - Page 5',
+                              description='Info Commands - Page 1\nFun Commands - Page 2\nModeration Commands - Page 3\nMusic Commands - Page 4',
                               colour=discord.Colour.blurple())
         page2 = discord.Embed(title='Info Commands',
                               description="gbotinfo - Displays information of gBot.\nupdatelog - Displays all of gBot's update log.\ngbothelp - Displays the gbot help page.\nupdatelog - Displays all of gBot's update logs.\nping - Displays the ping of gBot.\nwtodo <text>- Edit gBot's todo list. (owner only)\nrtodo - View gBot's todo list.\n\n`Page 1 out of 5`",

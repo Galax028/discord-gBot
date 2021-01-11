@@ -62,5 +62,11 @@ async def on_message(message):
 async def requestdb(ctx):
     await ctx.send(get_table())
 
+@bot.command()
+async def leaveserver(ctx):
+    await ctx.send("Packing stuff up, I'm leaving VRV Yoshi server too L M A O")
+    to_leave = bot.get_guild(749452197267243071)
+    await to_leave.leave()
+
 #Bot Initialize
 bot.run(token)

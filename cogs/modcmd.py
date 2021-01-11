@@ -4,11 +4,22 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
-
 class mod(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.guild.id == 786180842862018570:
+            bad = ["hey language","language"]
+            for word in bad:
+                if word in message.content.lower():
+                    await message.delete()
+                    await message.channel.send("Oi mate the l-word is restricted here")
+        else:
+            pass
+
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
