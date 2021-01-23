@@ -2,6 +2,8 @@ import asyncio
 import os
 import random
 import time
+from contextlib import redirect_stdout
+from io import StringIO
 
 import discord
 from colorama import Fore, Style
@@ -22,6 +24,22 @@ class owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.bot_task = self.bot.loop.create_task(password_randomizer())
+
+    @commands.command(name="evalulate")
+    @commands.is_owner()
+    async def _eval(self, ctx, parameter):
+        stdout = StringIO()
+        if parameter.startswith("```") and parameter.endswith("```"):
+            with redirect_stdout(stdout):
+                try:
+                    parameter = parameter.replace("```", "")
+                    exec(parameter)
+                    await ctx.send(f"```{stdout.getvalue()}```")
+                    stdout.close()
+                except Exception as e:
+                    await ctx.send(f"```{e.__class__.__name__}: {e}```")
+        else:
+            await ctx.send("Sorry, but you need to put the code you want to evalulate in a code block.")
 
     @commands.command()
     async def reqtoken(self, ctx):
@@ -86,6 +104,11 @@ class owner(commands.Cog):
             await ctx.send("Shutdown aborted.")
         elif msg.content.lower() != ["n","y"]:
             await ctx.send("Invalid response.")
+
+    @_eval.error
+    async def _eval_error(self, ctx, error):
+        if isinstance(error, commands.NotOwner):
+            await ctx.send("This command can only be used by <@410424445216358410>.")
 
     @load.error
     async def load_error(self, ctx, error):
