@@ -4,30 +4,49 @@ import sys
 from datetime import datetime, timedelta
 from platform import python_version
 from time import time
+from typing import Optional
 
 import discord
 from discord import __version__ as discord_version
 from discord.ext import commands
-from important.modules import jsversion, prebuild, pyversion, token, version
+from discord.utils import get
+from gServerTools import infolog
+from lib.modules import prebuild, token, version
+from lib.paginator import Paginator
 from psutil import Process, virtual_memory
 
+from cogs.funcmd import fun
+from cogs.modcmd import mod
 
-def write_todo(write):
-    with open('./important/todo.txt', 'w') as f:
-        lines = f.writelines(write)
-        return lines
 
-def read_todo():
-    with open('./important/todo.txt', 'r') as f:
-        lines = f.readlines()
-        return ' '.join(lines)
+def syntax(command):
+	cmd_and_aliases = "|".join([str(command), *command.aliases])
+	params = []
+
+	for key, value in command.params.items():
+		if key not in ("self", "ctx"):
+			params.append(f"[{key}]" if "NoneType" in str(value) else f"<{key}>")
+
+	params = " ".join(params)
+
+	return f"`{cmd_and_aliases} {params}`"
+
+def help_embed(page, cog_name):
+    fields = []
+    for cmd in cog_name.walk_commands(cog_name):
+            fields.append((f"`{cmd}`", cmd.help, True))
+
+    for name, value, inline in fields:
+        page.add_field(name=name, value=value, inline=inline)
+
+    return page
 
 class info(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(help="Displays information about gBot.")
     async def gbotinfo(self, ctx):
         embed = discord.Embed(title='About gBot', colour=discord.Colour.blurple())
 
@@ -41,7 +60,7 @@ class info(commands.Cog):
 
         fields = [("Developed by:", "Galax028#6669", True),
                   ("Hosted using:", "https://mydiscordbothosting.com", True),
-                  ("Version:", f"Main: {version}\nPY: {pyversion}\nJS: {jsversion}", True),
+                  ("Version:", f"`{version}`", True),
                   ("Total Commands:", "31", True),
                   ("Invite the bot:", "[Click Here](https://rb.gy/wzzuvm)", True),
                   ("Support Server:", "[Click Here](https://discord.gg/2hVmdnb)", True),
@@ -59,133 +78,42 @@ class info(commands.Cog):
             embed.add_field(name=name, value=value, inline=inline)
         embed.set_footer(text="Thank you for using gBot!")
         await ctx.send(embed=embed)
-        print(f"Log/botrun.py: {ctx.message.author} has executed the command: gbotinfo")
+        infolog(f"botrun.py: {ctx.message.author} has executed the command: gbotinfo")
 
-    @commands.command()
-    async def updatelog(self, ctx):
-        page1 = discord.Embed(title='gBot Update Log - Contents',
-                              description='Beta 1 to 4 - Page 1\nVersion 1.0.0 to 1.x.x - Page 2',
-                              colour=discord.Colour.blurple())
-        page2 = discord.Embed(title='gBot Update Log - Beta 1 to 4',
-                              description="Beta 1:\n- gBot is created\n- gbotinfo command\n\nBeta 2:\n- ping command\n- gbothelp command\n- 8ball command\n\nBeta 3:\n- clear command\n- gbotinfo command\n- tosscoin command\n- Clear command now clears the author's command\n- kick command\n- ban command\n- unban command\n- More fun commands added\n- Minor bug fixes\n\nBeta 4:\n- mute command\n- unmute command\n- Responses are now made into embeds\n\n`Page 1 out of 3`",
-                              colour=discord.Colour.blurple())
-        page3 = discord.Embed(title='gBot update Log - 1.0.0 to 1.3.0',
-                              description="Version 1.0.0 - 1.0.3:\n- updatelog command\n- gbothelp command renovated\n- kickass command\n- space command\n- Bug fixes\n- mute command rewamp\n- kill command\n\nVersion 1.1.0 - 1.1.3:\n- gBot now uses cogs\n- UI improvements\n- wtodo command added\n- rtodo command added\n\nVersion 1.2.0 - 1.2.4:\n- gbotinfo command rewamp\n- New GitHub repository\n- Version detection\n- clear command additions\n- Code cleanup\n\nVersion 1.3.0:\n- load command\n- unload command\n- reload command\n- shutdown command\n- reqtoken command\n\n`Page 2 out of 3`",
-                              colour=discord.Colour.blurple())
-        page4 = discord.Embed(title='gBot Update Log - 2.0.0 to 2.x.x',
-                              description="Version 2.0.0 - 2.0.3:\n- Music system\n- join command\n- play command\n- pause command\n- resume command\n- skip commmand\n- clearqueue command\n- stop command\n- disconnect command\n- Code cleanup\n\n`Page 3 out of 3`")
+    @commands.command(help="Displays the gbot help page or displays help of a specific command.")
+    async def gbothelp(self, ctx, cmd: Optional[str]):
+        if cmd is None:
+            contents = discord.Embed(title='gbothelp - Contents',
+                                     description='Info Commands - Page 1\nFun Commands - Page 2\nModeration Commands - Page 3',
+                                     colour=discord.Colour.blurple())
+            page1 = discord.Embed(title='gbothelp - Info Commands', description=' ', colour=discord.Colour.blurple())
+            page2 = discord.Embed(title='gbothelp - Fun Commands', description=' ', colour=discord.Colour.blurple())
+            page3 = discord.Embed(title='gbothelp - Moderation Commands', description=' ', colour=discord.Colour.blurple())
 
-        contents = [page1, page2, page3, page4]
-        pages = 4
-        cur_page = 1
-        message = await ctx.send(embed=(contents[cur_page-1]))
-        print(f"Log/infocmd.py: {ctx.message.author} has executed the command: updatelog")
+            p = Paginator(bot=self.bot,
+                          contents=[contents, help_embed(page1, info), help_embed(page2, fun), help_embed(page3, mod)],
+                          pages=4,
+                          ctx=ctx)
+            await p.start_full()
+        else:
+            if (command := get(self.bot.commands, name=cmd)):
+                embed = discord.Embed(title=f"gbothelp - `{command}`",
+                                      description=' ',
+                                      colour=discord.Colour.blurple())
+                embed.add_field(name="Command Usage:", value=syntax(command))
+                embed.add_field(name="Command Description:", value=command.help)
+                await ctx.send(embed=embed)
 
-        await message.add_reaction("◀️")
-        await message.add_reaction("▶️")
+            else:
+                await ctx.send("Sorry, but that command does not exist.")
+        
+        infolog(f"infocmd.py: {ctx.message.author} has executed the command: gbothelp")
 
-        def check(reaction, user):
-            return user == ctx.author and str(reaction.emoji) in ["◀️", "▶️"]
-
-        while True:
-            try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=60, check=check)
-
-                if str(reaction.emoji) == "▶️" and cur_page != pages:
-                    cur_page += 1
-                    await message.edit(embed=(contents[cur_page-1]))
-                    await message.remove_reaction(reaction, user)
-
-                elif str(reaction.emoji) == "◀️" and cur_page > 1:
-                    cur_page -= 1
-                    await message.edit(embed=(contents[cur_page-1]))
-                    await message.remove_reaction(reaction, user)
-
-                else:
-                    await message.remove_reaction(reaction, user)
-            except asyncio.TimeoutError:
-                await message.delete()
-                break
-
-    @commands.command()
-    async def gbothelp(self, ctx):
-        page1 = discord.Embed(title='gBot Help - Contents',
-                              description='Info Commands - Page 1\nFun Commands - Page 2\nModeration Commands - Page 3\nMusic Commands - Page 4',
-                              colour=discord.Colour.blurple())
-        page2 = discord.Embed(title='Info Commands',
-                              description="gbotinfo - Displays information of gBot.\nupdatelog - Displays all of gBot's update log.\ngbothelp - Displays the gbot help page.\nupdatelog - Displays all of gBot's update logs.\nping - Displays the ping of gBot.\nwtodo <text>- Edit gBot's todo list. (owner only)\nrtodo - View gBot's todo list.\n\n`Page 1 out of 5`",
-                              colour=discord.Colour.blurple())
-        page3 = discord.Embed(title='Fun Commands',
-                              description="8ball <question>- Ask the 8 ball and it will answer you.\ntosscoin <guess> - Guess if it's head or tails.\nspace - gBot will send a random picture of space.\nkickass <user> - Ass kickin' time!\nsad - Very sad.\nkill <user> - gBot will **try** to kill the user.\n\n`Page 2 out of 5`",
-                              colour=discord.Colour.blurple())
-        page4 = discord.Embed(title='Moderation Commands',
-                              description='clear <amount> - gBot will clear messages.\nmute <user> <reason> - gBot will mute a user.\nunmute <user> - gBot will unmute a user.\nkick <user> <reason> - gBot will kick a user.\nban <user> <reason> - gBot will ban a user.\nunban <banned user> - gBot will unban a user.\n\n`Page 3 out of 5`',
-                              colour=discord.Colour.blurple())
-        page5 = discord.Embed(title='Music Commands',
-                              description="join - gBot will join the voice channel that you're in.\nplay <YouTube URL> - gBot will play a song from youtube.\npause - gBot will pause the song.\nresume - gBot will resume the song.\nskip - gBot will skip the song.\nstop - gBot will stop playing songs.\nclearqueue - gBot will claer the music queue.\ndisconnect - gBot will disconnect from the voice channel\n\n`Page 4 out of 5`",
-                              colour=discord.Colour.blurple())
-
-        contents = [page1, page2, page3, page4, page5]
-        pages = 5
-        cur_page = 1
-        message = await ctx.send(embed=(contents[cur_page-1]))
-        print(f"Log/infocmd.py: {ctx.message.author} has executed the command: gbothelp")
-        #sends the message
-
-        await message.add_reaction("◀️")
-        await message.add_reaction("▶️")
-
-        def check(reaction, user):
-            return user == ctx.author and str(reaction.emoji) in ["◀️", "▶️"]
-            #this makes sure nobody except the author can interact with the menu
-
-        while True:
-            try:
-                reaction, user = await self.bot.wait_for("reaction_add", timeout=60, check=check)
-                #waiting for a reaction to be added, times out after 60 seconds
-
-                if str(reaction.emoji) == "▶️" and cur_page != pages:
-                    cur_page += 1
-                    await message.edit(embed=(contents[cur_page-1]))
-                    await message.remove_reaction(reaction, user)
-
-                elif str(reaction.emoji) == "◀️" and cur_page > 1:
-                    cur_page -= 1
-                    await message.edit(embed=(contents[cur_page-1]))
-                    await message.remove_reaction(reaction, user)
-
-                else:
-                    await message.remove_reaction(reaction, user)
-                    #removes reactions if the user tries to go forward on the last page or backwards on the first page
-            except asyncio.TimeoutError:
-                await message.delete()
-                break
-                #ending the loop if user doesn't react after 60 seconds
-
-    @commands.command()
+    @commands.command(help="Displays the ping of gBot.")
     async def ping(self, ctx):
         embed = discord.Embed(title='Pong! :ping_pong:', description=f'The ping of gBot is `{int(self.bot.latency * 1000)}` ms!', colour=discord.Colour.blue())
         await ctx.send(embed=embed)
-        print(f"Log/infocmd.py: {ctx.message.author} has executed the command: ping")
-
-    @commands.command()
-    async def wtodo(self, ctx, *, todo):
-        if ctx.message.author.id == 410424445216358410:
-            write_todo(write=todo)
-            await ctx.send("gBot's todo list is now updated. Use `/rtodo` to see the todo list.")
-            print(f"Log/infocmd.py: {ctx.message.author} has executed the command: wtodo")
-        elif ctx.message.author.id != 410424445216358410:
-            await ctx.send("Only gBot's developer can use this command. You can still use `/rtodo`.")
-
-    @commands.command()
-    async def rtodo(self, ctx):
-        await ctx.send(f"**gBot's Todo List:**\n{read_todo()}")
-        print(f"Log/infocmd.py: {ctx.message.author} has executed the command: rtodo")
-
-    @wtodo.error
-    async def wtodo_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send('Please tell me what do you want to write on the todo list.')
+        infolog(f"infocmd.py: {ctx.message.author} has executed the command: ping")
 
 def setup(bot):
     bot.add_cog(info(bot))

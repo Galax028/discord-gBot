@@ -6,17 +6,16 @@ from contextlib import redirect_stdout
 from io import StringIO
 
 import discord
-from colorama import Fore, Style
 from discord.ext import commands
-from important.modules import token
-
+from lib.modules import token
+from gServerTools import infolog, successlog, criticallog
 
 async def password_randomizer():
     while True:
         global password
         genpass = [random.randint(0,9),random.randint(0,9),random.randint(0,9),random.randint(0,9),random.randint(0,9)]
         password = str(genpass).strip("[]'").replace(', ', '')
-        print(f"{Fore.BLUE}[PRIORITY]ownercmd.py: The new password for /reqtoken is '{password}'.{Style.RESET_ALL}")
+        successlog(f"[PRIORITY]ownercmd.py: The new password for /reqtoken is '{password}'.")
         await asyncio.sleep(3600)
 
 class owner(commands.Cog):
@@ -44,7 +43,7 @@ class owner(commands.Cog):
     @commands.command()
     async def reqtoken(self, ctx):
         await ctx.send("Please type in the password. (`15s timeout`)")
-        print(f"Log/ownercmd.py: {ctx.message.author} has executed the command: reqtoken")
+        infolog(f"ownercmd.py: {ctx.message.author} has executed the command: reqtoken")
         msg = await self.bot.wait_for('message', timeout=15 ,check=lambda message: message.author == ctx.author)
         if msg.content.lower() == password:
             await ctx.send(f"Password is correct.\nThe token is: ||{token}||.")
@@ -56,24 +55,28 @@ class owner(commands.Cog):
     async def load(self, ctx, *, cog: str):
         try:
             self.bot.load_extension(f"cogs.{cog[:-3]}")
-        except Exception:
+        except Exception as e:
             await ctx.send(f"An error occurred while trying to load the cog `{cog}`.")
-            print(f"{Fore.RED}[PRIORITY]ownercmd.py: Failed to load cog {cog}.{Style.RESET_ALL}")
+            await ctx.send(f"{e.__class__.__name__}: {e}")
+            criticallog(f"[PRIORITY]ownercmd.py: Failed to load cog {cog}.")
+            criticallog(f"{e.__class__.__name__}: {e}")
         else:
             await ctx.send(f"Loaded cog `{cog}` successfully.")
-            print(f"{Fore.GREEN}[PRIORITY]ownercmd.py: Cog {cog} is now loaded.{Style.RESET_ALL}")
+            successlog(f"[PRIORITY]ownercmd.py: Cog {cog} is now loaded.")
 
     @commands.command()
     @commands.is_owner()
     async def unload(self, ctx, *, cog: str):
         try:
             self.bot.unload_extension(f"cogs.{cog[:-3]}")
-        except Exception:
+        except Exception as e:
             await ctx.send(f"An error occurred while trying to unload the cog `{cog}`.")
-            print(f"{Fore.RED}[PRIORITY]ownercmd.py: Failed to unload cog {cog}.{Style.RESET_ALL}")
+            await ctx.send(f"{e.__class__.__name__}: {e}")
+            criticallog(f"[PRIORITY]ownercmd.py: Failed to unload cog {cog}.")
+            criticallog(f"{e.__class__.__name__}: {e}")
         else:
             await ctx.send(f"Unloaded cog `{cog}` successfully.")
-            print(f"{Fore.GREEN}[PRIORITY]ownercmd.py: Cog {cog} is now unloaded.{Style.RESET_ALL}")
+            successlog(f"[PRIORITY]ownercmd.py: Cog {cog} is now unloaded.")
 
     @commands.command()
     @commands.is_owner()
@@ -83,22 +86,22 @@ class owner(commands.Cog):
             self.bot.load_extension(f"cogs.{cog[:-3]}")
         except Exception:
             await ctx.send(f"An error occurred while trying to reload the cog `{cog}`.")
-            print(f"{Fore.RED}[PRIORITY]ownercmd.py: Failed to reload cog {cog}.{Style.RESET_ALL}")
+            infolog(f"[PRIORITY]ownercmd.py: Failed to reload cog {cog}.")
         else:
             await ctx.send(f"Reloaded cog `{cog}` successfully.")
-            print(f"{Fore.GREEN}[PRIORITY]ownercmd.py: Cog {cog} is now reloaded.{Style.RESET_ALL}")
+            successlog(f"[PRIORITY]ownercmd.py: Cog {cog} is now reloaded.")
 
     @commands.command()
     @commands.is_owner()
     async def shutdown(self, ctx):
         await ctx.send("Are you sure you want to shutdown?(`y/n`,`10s timeout`):")
-        print(f"Log/ownercmd.py: {ctx.message.author} has executed the command: shutdown")
+        infolog(f"ownercmd.py: {ctx.message.author} has executed the command: shutdown")
         msg = await self.bot.wait_for('message', timeout=10 ,check=lambda message: message.author == ctx.author)
         if msg.content.lower() == "y":
             await ctx.send("Logging Out...")
             time.sleep(2)
             await ctx.send("It is now safe to kill the terminal.")
-            print(f"{Fore.RED}[PRIORITY]ownercmd.py: gBot has been shutted down.{Style.RESET_ALL}")
+            infolog(f"[PRIORITY]ownercmd.py: gBot has been shutted down.")
             await self.bot.logout()
         elif msg.content.lower() == "n":
             await ctx.send("Shutdown aborted.")

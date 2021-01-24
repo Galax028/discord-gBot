@@ -6,12 +6,12 @@ import os
 
 import discord
 import gspread
-from colorama import Fore, Style
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
+from gServerTools import criticallog, infolog, successlog
 from oauth2client.service_account import ServiceAccountCredentials
 
-from important.modules import jsversion, prebuild, pyversion, token, version
+from lib.modules import prebuild, token, version
 
 #Bot Preparations
 bot = commands.Bot(command_prefix = '/')
@@ -29,19 +29,32 @@ def get_table():
 
 @bot.event
 async def on_ready():
-    print(f"{Fore.GREEN}[PRIORITY]botrun.py: gBot is now online.{Style.RESET_ALL}")
-    print(f"{Fore.GREEN}[PRIORITY]botrun.py: The latency is {int(bot.latency * 1000)} ms.{Style.RESET_ALL}")
+    successlog(f"[PRIORITY]botrun.py: gBot is now online.")
+    successlog(f"[PRIORITY]botrun.py: The latency is {int(bot.latency * 1000)} ms.")
     await bot.change_presence(status=discord.Status.online, activity=discord.Game(f'/gbothelp | v.{version}'))
 
-for filename in os.listdir('Python/discord-gBot/cogs'):
+for filename in os.listdir('Python\discord-gBot\cogs'):
     if filename.endswith('.py'):
-        bot.load_extension(f'cogs.{filename[:-3]}')
-        print(f"{Fore.GREEN}[PRIORITY]botrun.py: Cog {filename} is now loaded.{Style.RESET_ALL}")
+        cogs_list = []
+        if filename.startswith('m_'):
+            pass
+        else:
+            cogs_list.append(filename[:-3])
+        
+        for i in range(len(cogs_list)):
+            try:
+                bot.load_extension(f'cogs.{cogs_list[i]}')
+                successlog(f"[PRIORITY]botrun.py: Cog {filename} is now loaded.")
+            except Exception as e:
+                criticallog(f"[PRIORITY]botrun.py: A critical error occurred while loading cog {filename}.")
+                criticallog(f"{e.__class__.__name__}: {e}")
 
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound):
         return
+    else:
+        raise error
 
 @bot.event
 async def on_message(message):

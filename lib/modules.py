@@ -23,15 +23,3 @@ if token == prebuild:
     version = pre_version()
 elif token != prebuild:
     version = read_version()
-
-def read_jsversion():
-    with open('Python/discord-gBot/important/config.txt', 'r') as f:
-        lines = f.readlines()
-        return lines[3].replace(""""version": """, '')
-jsversion = read_jsversion()
-
-def read_pyversion():
-    with open('Python/discord-gBot/important/config.txt', 'r') as f:
-        lines = f.readlines()
-        return lines[17].strip()
-pyversion = read_pyversion()
