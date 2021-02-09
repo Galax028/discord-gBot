@@ -19,8 +19,7 @@ class Paginator():
         await message.add_reaction("⏹️")
 
         def check(reaction, user):
-            return user == self.ctx.author and str(
-                reaction.emoji) in ["⏪", "◀️", "▶️", "⏩", "⏹️"]
+            return user == self.ctx.author and str(reaction.emoji) in ["⏪", "◀️", "▶️", "⏩", "⏹️"]
 
         while True:
             try:
@@ -53,6 +52,7 @@ class Paginator():
 
                 else:
                     await message.remove_reaction(reaction, user)
+
             except asyncio.TimeoutError:
                 await self.ctx.message.delete()
                 await message.delete()
@@ -66,8 +66,7 @@ class Paginator():
         await message.add_reaction("⏹️")
 
         def check(reaction, user):
-            return user == self.ctx.author and str(
-                reaction.emoji) in ["◀️", "▶️", "⏹️"]
+            return user == self.ctx.author and str(reaction.emoji) in ["◀️", "▶️", "⏹️"]
 
         while True:
             try:
@@ -90,6 +89,7 @@ class Paginator():
 
                 else:
                     await message.remove_reaction(reaction, user)
+                    
             except asyncio.TimeoutError:
                 await self.ctx.message.delete()
                 await message.delete()

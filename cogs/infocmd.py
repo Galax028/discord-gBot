@@ -1,3 +1,5 @@
+# pylint: disable=import-error, no-name-in-module
+
 import asyncio
 import os
 import sys
@@ -11,7 +13,7 @@ from discord import __version__ as discord_version
 from discord.ext import commands
 from discord.utils import get
 from gServerTools import infolog
-from lib.modules import prebuild, token, version
+from lib.conf_importer import prebuild, token, version
 from lib.paginator import Paginator
 from psutil import Process, virtual_memory
 
@@ -114,6 +116,7 @@ class info(commands.Cog):
         embed = discord.Embed(title='Pong! :ping_pong:', description=f'The ping of gBot is `{int(self.bot.latency * 1000)}` ms!', colour=discord.Colour.blue())
         await ctx.send(embed=embed)
         infolog(f"infocmd.py: {ctx.message.author} has executed the command: ping")
+
 
 def setup(bot):
     bot.add_cog(info(bot))

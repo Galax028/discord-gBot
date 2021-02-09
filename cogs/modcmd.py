@@ -1,4 +1,4 @@
-import time
+import asyncio
 from datetime import datetime
 from typing import Optional
 
@@ -29,7 +29,7 @@ class mod(commands.Cog):
         amount = amount + 1
         await ctx.channel.purge(limit=amount)
         notify = await ctx.send(f"Cleared `{amount-1}` messages.")
-        time.sleep(1)
+        await asyncio.sleep(1)
         await notify.delete()
         infolog(f"modcmd.py: {ctx.message.author} has executed the command: clear")
 
@@ -88,43 +88,32 @@ class mod(commands.Cog):
     async def clear_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('Please provide the number of messages you want to clear.')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("Sorry, but you don't have permissions to do that.")
 
     @mute.error
     async def mute_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('Please tell me the person you want to mute.')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("Sorry, but you don't have permissions to do that.")
 
     @unmute.error
     async def unmute_error(self, ctx,error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('Please tell me the person you want to unmute.')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("Sorry, but you don't have permissions to do that.")
 
     @kick.error
     async def kick_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('Please tell me the person you want to kick.')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("Sorry, but you don't have permissions to do that.")
 
     @ban.error
     async def ban_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('Please tell me the person you want to ban.')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("Sorry, but you don't have permissions to do that.")
 
     @unban.error
     async def unban_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('Please tell me the person you want to unban.')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("Sorry, but you don't have the permissions to do that.")
+
 
 def setup(bot):
     bot.add_cog(mod(bot))
