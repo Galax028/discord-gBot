@@ -2,6 +2,8 @@ gBot's Update Log and Planned Features
 --------------------------------------
 This markdown file includes different information about the updates of gBot.
 This markdown file will also include planned features in the future.
+If anyone want certain features to be added, please create a new issue.
+Or if you have fixes or updates, create a pull request.
    
 **Contents**
 - [Update Logs](#update-logs)
