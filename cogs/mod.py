@@ -6,8 +6,7 @@ import discord
 from discord.ext import commands
 from gServerTools import infolog
 
-class mod(commands.Cog):
-
+class ModCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -23,7 +22,7 @@ class mod(commands.Cog):
             pass
 
 
-    @commands.command(aliases=["purge","cls","delete","remove"], help="gBot will clear messages.")
+    @commands.command(aliases=["purge", "cls", "delete", "remove"], help="gBot will clear messages.")
     @commands.has_permissions(manage_messages=True)
     async def clear(self, ctx, amount : int):
         amount = amount + 1
@@ -31,7 +30,7 @@ class mod(commands.Cog):
         notify = await ctx.send(f"Cleared `{amount-1}` messages.")
         await asyncio.sleep(1)
         await notify.delete()
-        infolog(f"modcmd.py: {ctx.message.author} has executed the command: clear")
+        infolog(f"{ctx.message.author} has executed the command: clear")
 
     @commands.command(help="gBot will mute a user.")
     @commands.has_permissions(kick_members=True)
@@ -45,7 +44,7 @@ class mod(commands.Cog):
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         await member.add_roles(role)
         await ctx.send(f'{member.mention} has been muted. Reason: {reason}')
-        infolog(f"modcmd.py: {ctx.message.author} has executed the command: mute")
+        infolog(f"{ctx.message.author} has executed the command: mute")
 
     @commands.command(help="gBot will unmute a user.")
     @commands.has_permissions(kick_members=True)
@@ -53,21 +52,21 @@ class mod(commands.Cog):
         role = discord.utils.get(ctx.guild.roles, name='Muted')
         await member.remove_roles(role)
         await ctx.send(f'{member.mention} has been unmuted.')
-        infolog(f"modcmd.py: {ctx.message.author} has executed the command: unmute")
+        infolog(f"{ctx.message.author} has executed the command: unmute")
 
     @commands.command(help="gBot will kick a user.")
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *, reason: Optional[str] = None):
         await member.kick(reason=reason)
         await ctx.send(f'{member.mention} has beed kicked. Reason: {reason}')
-        infolog(f"modcmd.py: {ctx.message.author} has executed the command: kick")
+        infolog(f"{ctx.message.author} has executed the command: kick")
 
     @commands.command(help="gBot will ban a user.")
     @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, member: discord.Member, *, reason: Optional[str] = None):
         await member.ban(reason=reason)
         await ctx.send(f'{member.mention} has beed banned. Reason: {reason}')
-        infolog(f"modcmd.py: {ctx.message.author} has executed the command: ban")
+        infolog(f"{ctx.message.author} has executed the command: ban")
 
     @commands.command(help="gBot will unban a user.")
     @commands.has_permissions(ban_members=True)
@@ -81,7 +80,7 @@ class mod(commands.Cog):
         if (user.name, user.discriminator) == (member_name, member_discriminator):
             await ctx.guild.unban(user)
             await ctx.send(f'{user.mention} has been unbanned.')
-            infolog(f"modcmd.py: {ctx.message.author} has executed the command: unban")
+            infolog(f"{ctx.message.author} has executed the command: unban")
             return
 
     @clear.error
@@ -116,4 +115,4 @@ class mod(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(mod(bot))
+    bot.add_cog(ModCog(bot))

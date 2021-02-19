@@ -1,38 +1,90 @@
 # pylint: disable=import-error, no-name-in-module
 
+import asyncio
 import os
+import sqlite3
+import sys
 
+import aiosqlite
 import discord
 from discord.ext import commands
-from gServerTools import criticallog, errorlog, infolog, successlog
+from gServerTools import criticallog, infolog, successlog
 
-from lib.conf_importer import prebuild, token, version
+from lib.conf_importer import token, version
 
 
 class gBot(commands.Bot):
-    def __init__(self, prefix : str, help_cmd, bot_token : str):
-        super().__init__(command_prefix=prefix, help_command=help_cmd, case_insensitive=True)
-        self.token = bot_token
+    def __init__(self, token : str, dbpath : str, load_cogs : bool, jishaku : bool, status, activity, help_cmd=None):
+        super().__init__(command_prefix=self.get_prefix,
+                         help_command=help_cmd,
+                         case_insensitive=True,
+                         status=status,
+                         activity=activity)
+        self.token = token
+        self.dbpath = dbpath
+        self.load_cogs = load_cogs
+        self.jishaku = jishaku
 
-    def setup(self):
-        for filename in os.listdir('Python\\discord-gBot\\cogs'):
-            if filename.endswith('.py'):
-                try:
-                    bot.load_extension(f'cogs.{filename[:-3]}')
-                    successlog(f"[PRIORITY]bot.py: Cog {filename} is now loaded.")
-                except Exception as e:
-                    criticallog(f"[PRIORITY]bot.py: A critical error occurred while loading cog {filename}.")
-                    criticallog(f"{e.__class__.__name__}: {e}")
-    
     def run(self):
-        infolog("[PRIORITY]bot.py: Loading cogs...")
-        self.setup()
-        infolog("[PRIORITY]bot.py: gBot is starting up...")
+        if self.load_cogs == True:
+            self.cogloader()
+        
+        if self.jishaku == True:
+            infolog("SETUP: Loading Jishaku...")
+            super().load_extension("jishaku")
+            successlog("SETUP:     └╴Jishaku has been loaded.")
+
+        asyncio.run(self.dbloader())
+        infolog("SETUP: Connecting to Discord API...")
         super().run(self.token)
-        successlog("[PRIORITY]bot.py: Connected to bot account.")
+    
+    def cogloader(self):
+        infolog("SETUP: Loading cogs...")
+        for file in os.listdir("Python/discord-gBot/cogs"):
+            if file.endswith(".py"):
+                try:
+                    super().load_extension(f'cogs.{file[:-3]}')
+                    successlog(f"SETUP:     └╴Cog {file} is now loaded.")
+                except Exception as e:
+                    criticallog(f"SETUP:     └╴A critical error occurred while loading cog {file}.")
+                    criticallog(f"SETUP:         └╴{e.__class__.__name__}: {e}")
+
+    async def dbloader(self):
+        infolog("SETUP: Checking Sqlite database...")
+        async with aiosqlite.connect(self.dbpath) as db:
+            try:
+                await db.execute("SELECT * FROM datastore")
+                successlog("SETUP:     └╴Datastore table found.")
+            except sqlite3.OperationalError:
+                criticallog("SETUP:     └╴Sqlite database corrupted. Aborting setup process.")
+                sys.exit(1)
+        successlog("SETUP:     └╴Sqlite database check completed.")
+    
+    async def on_ready(self):
+        successlog("SETUP:     └╴Connected to Discord API.")
+        infolog("gBot is now online.")
+    
+    async def get_prefix(self, message):
+        guild_id = message.guild.id
+        async with aiosqlite.connect(self.dbpath) as db:
+            try:
+                async with db.execute("""SELECT prefix FROM prefixes WHERE guild_id=?""", (guild_id,)) as cursor:
+                    prefix = await cursor.fetchone()
+                    return prefix[0]
+            except TypeError:
+                await db.execute("""INSERT INTO prefixes (guild_id, prefix) VALUES (?, ?)""", (guild_id, "/"))
+                await db.commit()
+                return "/"
+            
 
 
 if __name__ == "__main__":
     os.system("")
-    bot = gBot(prefix='/', help_cmd=None ,bot_token=token)
+    bot = gBot(token=token,
+               dbpath="Python/discord-gBot/data/bot.db",
+               load_cogs=True,
+               jishaku=True,
+               help_cmd=None,
+               status=discord.Status.online,
+               activity=discord.Game(f'/gbothelp | v.{version}'))
     bot.run()

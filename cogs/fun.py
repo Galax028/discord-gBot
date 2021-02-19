@@ -7,8 +7,7 @@ from discord.ext import commands
 from gServerTools import infolog
 
 
-class fun(commands.Cog):
-
+class FunCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -23,7 +22,7 @@ class fun(commands.Cog):
         embed = discord.Embed(title=':8ball: 8ball!', colour=discord.Colour.dark_blue())
         embed.add_field(name=f'Question: {question}', value=f'Answer: {random.choice(responses)}')
         await ctx.send(embed=embed)
-        infolog(f"funcmd.py: {ctx.message.author} has executed the command: _8ball")
+        infolog(f"{ctx.message.author} has executed the command: _8ball")
 
     @commands.command(aliases=["tc","toss","coin"], help="Guess if it's head or tails.")
     async def tosscoin(self, ctx, *, guess):
@@ -31,7 +30,7 @@ class fun(commands.Cog):
         embed=discord.Embed(title='Toss a Coin!', colour=discord.Colour.gold())
         embed.add_field(name=f'Your guess: {guess}', value=f'Result: {random.choice(responses)}')
         await ctx.send(embed=embed)
-        infolog(f"funcmd.py: {ctx.message.author} has executed the command: tosscoin")
+        infolog(f"{ctx.message.author} has executed the command: tosscoin")
 
     @commands.command(help="gBot will send a random picture of space.")
     async def space(self, ctx):
@@ -39,13 +38,13 @@ class fun(commands.Cog):
             responses = f.readlines()
         await ctx.send('Here you go.')
         await ctx.send(random.choice(responses))
-        infolog(f"funcmd.py: {ctx.message.author} has executed the command: space")
+        infolog(f"{ctx.message.author} has executed the command: space")
 
     @commands.command(aliases=["ka"], help="Ass kickin' time!")
     async def kickass(self, ctx, member: discord.Member):
         responses = list(range(1,99))
         await ctx.send(f"{ctx.message.author.mention} has kicked {member.mention}'s ass and dealt `{random.choice(responses)}` damage!")
-        infolog(f"funcmd.py: {ctx.message.author} has executed the command: kickass")
+        infolog(f"{ctx.message.author} has executed the command: kickass")
 
     @commands.command(help="Very sad.")
     async def sad(self, ctx):
@@ -53,7 +52,7 @@ class fun(commands.Cog):
         embed.add_field(name='Baka Mitai Lyrics', value='dame da ne,\ndame yo,\ndame na no yo,\nanta ga,\nsuki de suki sugite,\ndore dake,\ntsuyoi osake de mo,\nyugamanai,\nomoide ga,\nbaka mitai')
         await ctx.send(embed=embed)
         await ctx.send('https://thumbs.gfycat.com/GleefulUnfortunateBlackrussianterrier-max-1mb.gif')
-        infolog(f"funcmd.py: {ctx.message.author} has executed the command: sad")
+        infolog(f"{ctx.message.author} has executed the command: sad")
 
     @commands.command(help="gBot will **try** to kill the user.")
     async def kill(self, ctx, member: discord.Member):
@@ -67,7 +66,7 @@ class fun(commands.Cog):
                      f"You know what, nah. You don't pay me enough to do this, {ctx.message.author.mention}. I'm just gonna kill the 2 of you, because why not!    *several gunshots*",
                      f"*gunshots* Oops, I missed all the shots, guess I'll stop being a hitman. By the way, I'm not giving you the refund {ctx.message.author.mention}, it's for the ammo cost."]
         await ctx.send(random.choice(responses))
-        infolog(f"funcmd.py: {ctx.message.author} has executed the command: kill")
+        infolog(f"{ctx.message.author} has executed the command: kill")
 
     @_8ball.error
     async def _8ball_error(self, ctx, error):
@@ -89,5 +88,6 @@ class fun(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send('Who do you even want me to kill.... Tell me before I shoot you instead because of boredom.')
 
+
 def setup(bot):
-    bot.add_cog(fun(bot))
+    bot.add_cog(FunCog(bot))
