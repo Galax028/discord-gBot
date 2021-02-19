@@ -28,6 +28,12 @@ This fix is implemented by using dictionaries on different variables of the pagi
    
 This version also fixed a couple of grammar and spelling mistakes.
 
+## Version 1.5.0 [Custom Server Prefix]
+---------------------------------------
+This update introduces custom server prefix by using a sqlite database. 2 new commands are added. They are, `setprefix` and `prefix`. `setprefix` will change the server's prefix. Only server administrators can use this command. `prefix` sends the current prefix of gBot. A new cog is also added to organize these commands, it is called `ConfigCog` and is also added to the help command.
+
+This version also has more spelling fixes.
+
 ---
 
 # Planned Features
@@ -47,4 +53,3 @@ List of features:
     - Item and power-up shop
     - Stocks or cryptocurrency market
     - Bankruptcy, loans and interests
-  - Custom prefixes for different guilds (This might come in version 1.5.0)
