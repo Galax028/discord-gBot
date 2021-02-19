@@ -17,6 +17,7 @@ Key Features
 Useful Links
 ------------
 
+- `Update Logs and Planned Features <https://github.com/Galax028/discord-gBot/blob/main/UPDATE-LOG.md>`_
 - `Invite the Bot <https://rb.gy/wzzuvm>`_
 - `gBot's Support Server <https://discord.gg/2hVmdnb>`_
 
