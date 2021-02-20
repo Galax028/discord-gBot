@@ -19,7 +19,7 @@ Or if you have fixes or updates, create a pull request.
 This update has changed how versions function. The first number indicates an enormous update, for example a whole new system.
 The second number indicates normal updates, bug fixes, etc,. Finally, the last number indicates miscellaneous fixes and updates.
     
-This version also has a couple bug fixes.
+This version also has a couple bug fixes. Removed some hard coding, and refactoring some code.
 
 ## Version 1.4.2 [Paginator Fix]
 -------------------------------
