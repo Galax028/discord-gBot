@@ -23,4 +23,5 @@ Useful Links
 
 -----
 
-**Made with love by, Galax028**
+Disclaimer: This repository is view only. To learn more about this, `click here <https://choosealicense.com/no-permission/>`_.
+© 2020 - 2021 Galax028. All rights reserved.
