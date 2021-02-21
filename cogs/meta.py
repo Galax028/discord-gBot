@@ -3,7 +3,6 @@
 import aiosqlite
 import discord
 from discord.ext import commands
-from discord.ext.commands import CommandNotFound
 from gServerTools import errorlog, successlog
 
 from lib.conf_importer import version
@@ -16,14 +15,15 @@ class MetaCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-
-        if isinstance(error, CommandNotFound):
+        if isinstance(error, commands.CommandNotFound):
             return
         if isinstance(error, commands.NotOwner):
             return await ctx.send("Sorry, but this command can only be used by the owner of gBot.")
         if isinstance(error, commands.MissingPermissions):
             return await ctx.send("Sorry, but you don't have permissions to do that.")
         if isinstance(error, commands.MissingRequiredArgument):
+            return await ctx.send(error)
+        if isinstance(error, commands.BotMissingPermissions):
             return
         if isinstance(error, commands.CommandInvokeError):
             error = error.original
@@ -48,23 +48,17 @@ class MetaCog(commands.Cog):
             return await ctx.send(embed=errorEmbed)
 
     @commands.Cog.listener()
-    async def on_message(self, message):
-        if self.bot.user.mentioned_in(message) and message.mention_everyone is False:
-            await message.channel.send('What do you need help with?\n - use `/gbothelp` to see the full help.\n - use `/gbotinfo` to see the info of gBot.')
-        else:
-            pass
-
-    @commands.Cog.listener()
     async def on_guild_join(self, guild):
         async with aiosqlite.connect(self.dbpath) as db:
-            await db.execute("""INSERT INTO prefixes (guild_id, prefix) VALUES (?, ?)""", (guild.id, "/"))
+            await db.execute("""INSERT INTO guild_config (guild_id, prefix, pagination) VALUES (?, ?, ?)""", (guild.id, "/", "auto"))
             await db.commit()
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
         async with aiosqlite.connect(self.dbpath) as db:
-            await db.execute("""DELETE FROM prefixes WHERE guild_id=?""", (guild.id,))
+            await db.execute("""DELETE FROM guild_config WHERE guild_id=?""", (guild.id,))
             await db.commit()
+
 
 def setup(bot):
     bot.add_cog(MetaCog(bot))

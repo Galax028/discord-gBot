@@ -14,16 +14,17 @@ from lib.conf_importer import token, version
 
 
 class gBot(commands.Bot):
-    def __init__(self, token : str, dbpath : str, load_cogs : bool, jishaku : bool, status, activity, help_cmd=None):
+    def __init__(self, **kwargs):
         super().__init__(command_prefix=self.get_prefix,
-                         help_command=help_cmd,
+                         help_command=kwargs["help_cmd"],
                          case_insensitive=True,
-                         status=status,
-                         activity=activity)
-        self.token = token
-        self.dbpath = dbpath
-        self.load_cogs = load_cogs
-        self.jishaku = jishaku
+                         status=kwargs["status"],
+                         activity=kwargs["activity"])
+
+        self.token = kwargs["token"]
+        self.dbpath = kwargs["dbpath"]
+        self.load_cogs = kwargs["load_cogs"]
+        self.jishaku = kwargs["jishaku"]
 
     def run(self):
         if self.load_cogs == True:
@@ -53,8 +54,10 @@ class gBot(commands.Bot):
         infolog("SETUP: Checking Sqlite database...")
         async with aiosqlite.connect(self.dbpath) as db:
             try:
+                await db.execute("SELECT * FROM guild_config")
+                successlog("SETUP:     └╴guild_config table found.")
                 await db.execute("SELECT * FROM datastore")
-                successlog("SETUP:     └╴Datastore table found.")
+                successlog("SETUP:     └╴datastore table found.")
             except sqlite3.OperationalError:
                 criticallog("SETUP:     └╴Sqlite database corrupted. Aborting setup process.")
                 sys.exit(1)
@@ -68,14 +71,13 @@ class gBot(commands.Bot):
         guild_id = message.guild.id
         async with aiosqlite.connect(self.dbpath) as db:
             try:
-                async with db.execute("""SELECT prefix FROM prefixes WHERE guild_id=?""", (guild_id,)) as cursor:
+                async with db.execute("""SELECT prefix FROM guild_config WHERE guild_id=?""", (guild_id,)) as cursor:
                     prefix = await cursor.fetchone()
                     return prefix[0]
             except TypeError:
-                await db.execute("""INSERT INTO prefixes (guild_id, prefix) VALUES (?, ?)""", (guild_id, "/"))
+                await db.execute("""INSERT INTO guild_config (guild_id, prefix) VALUES (?, ?)""", (guild_id, "/"))
                 await db.commit()
                 return "/"
-            
 
 
 if __name__ == "__main__":

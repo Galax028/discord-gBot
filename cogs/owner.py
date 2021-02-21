@@ -142,7 +142,7 @@ class OwnerCog(commands.Cog):
     @panel.command()
     async def reload(self, ctx, *, cog: str):
         if cog == "all":
-            for filename in os.listdir('Python\\discord-gBot\\cogs'):
+            for filename in os.listdir('Python/discord-gBot/cogs'):
                 if filename.endswith('.py'):
                     try:
                         self.bot.reload_extension(f"cogs.{filename[:-3]}")
@@ -158,7 +158,7 @@ class OwnerCog(commands.Cog):
     async def updater(self, ctx):
         await ctx.send("Launching updater script...")
         if os.name == "nt":
-            subprocess.Popen(["py", "Python\\discord-gBot\\update_wait.py"])
+            subprocess.Popen(["py", "Python/discord-gBot/update_wait.py"])
         else:
             subprocess.Popen(["bash", "python3", "Python/discord-gBot/update_wait.py", "&"])
         await ctx.send("Logging Out...")

@@ -2,7 +2,6 @@ import sys
 
 import discord
 from discord.ext import commands
-from discord.ext.commands import CommandNotFound
 from gServerTools import errorlog, successlog
 
 from lib.conf_importer import token, version
@@ -17,9 +16,9 @@ async def on_ready():
 
 @bot.event
 async def on_command_error(ctx, error):
-    if isinstance(error, CommandNotFound):
+    if isinstance(error, commands.CommandNotFound):
         embed = discord.Embed(title="Sorry for the inconvenience!",
-                              description="gBot is going through a maintaince period right now, please wait until gBot's status become online. Then you will be able to use gBot again.",
+                              description="gBot is going through a maintenance period right now, please wait until gBot's status become online. Then you will be able to use gBot again.",
                               colour=discord.Colour.red())
         await ctx.send(embed=embed)
     else:
