@@ -1,4 +1,4 @@
-Galax's gBot Version 1.4.1
+Galax's gBot Version 1.6.1
 ==========================
 
 .. image:: https://discord.com/api/guilds/730641599436161075/embed.png
@@ -23,4 +23,6 @@ Useful Links
 
 -----
 
-**Made with love by, Galax028**
+Disclaimer: This repository is view only. To learn more about this, `click here <https://choosealicense.com/no-permission/>`_.
+
+© 2020 - 2021 Galax028. All rights reserved.

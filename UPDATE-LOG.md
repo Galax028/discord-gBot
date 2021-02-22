@@ -34,6 +34,12 @@ This update introduces custom server prefix by using a sqlite database. 2 new co
 
 This version also has more spelling fixes.
 
+## Version 1.6.0 [Pagination Configuration]
+-------------------------------------------
+This version fixes more pagination problems. If the bot didn't had the manage messages permission, commands that use pagination will break. Now it works fine. 3 new commands are also added in this version. `setpaginationmode`, `paginationmode`, and `httpcode`. `httpcode` is a new fun command that sends http response cats! `setpaginationmode` will change the server's pagination mode. Only server administrators can use this command. There are only 2 modes, which are `auto` and `manual`. `auto` mode will automatically remove pagination reactions and delete the message after inactivity, but this mode requires the bot to have the manage messages permission. `manual` mode does the opposite to `auto` mode and does not require special permissions.
+
+Side note: We might have a new developer to work on gBot pretty soon. He is currently trying to purpose an economy system design.
+
 ---
 
 # Planned Features
