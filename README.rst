@@ -1,5 +1,5 @@
-Galax's gBot Version 1.7.0
-==========================
+Galax's gBot [Version 1.7.0]
+============================
 
 .. image:: https://discord.com/api/guilds/730641599436161075/embed.png
    :target: https://discord.gg/2hVmdnb
@@ -12,6 +12,7 @@ Key Features
 
 - Fun Commands
 - Moderation Commands
+- Verification System
 - Economy System (Coming Soon)
 
 Useful Links
