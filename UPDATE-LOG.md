@@ -40,6 +40,12 @@ This version fixes more pagination problems. If the bot didn't had the manage me
 
 Side note: We might have a new developer to work on gBot pretty soon. He is currently trying to purpose an economy system design.
 
+## Version 1.7.0 [I'm not a robot]
+----------------------------------
+This version introduces the new captcha system! New commands are `setverificationchannel`, `verificationchannel`, and verify. `setverificationchannel` will setup the captcha system for the server. It will restrict the @everyone role so that unverified people cant access other channels other than the verification channel. The bot will also create a role called "Verified" for verified people. *Do not change the name of the verified role, if you change it the captcha system will create another "Verified" role.* `verificationchannel` will tell the user which channel is used for verification. `verify` can only be used in a verification channel. The bot will send a captcha with random uppercase characters and numbers. If you succeed, you will get the "Verified" role.
+
+Bugs not fixed: `panel updater` doesn't really execute the update_wait.py script in linux. I'm having problems with bash.
+
 ---
 
 # Planned Features

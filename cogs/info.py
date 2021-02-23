@@ -13,7 +13,6 @@ import discord
 from discord import __version__ as discord_version
 from discord.ext import commands
 from discord.utils import get
-from gServerTools import infolog
 from lib.conf_importer import prebuild, token, version
 from lib.paginator import Paginator
 from psutil import Process, virtual_memory
@@ -91,7 +90,6 @@ class InfoCog(commands.Cog):
             embed.add_field(name=name, value=value, inline=inline)
         embed.set_footer(text="Thank you for using gBot!")
         await ctx.send(embed=embed)
-        infolog(f"{ctx.message.author} has executed the command: gbotinfo")
 
     @commands.command(help="Displays the gbot help page or displays help of a specific command.")
     @commands.bot_has_permissions(manage_messages=True)
@@ -127,22 +125,21 @@ class InfoCog(commands.Cog):
                 embed = discord.Embed(title=f"gbothelp - `{command}`",
                                       description=' ',
                                       colour=discord.Colour.blurple())
-                embed.add_field(name="Command Usage:", value=syntax(command), inline=False)
-                embed.add_field(name="Command Description:", value=command.help, inline=False)
+                embed.add_field(name="Command Usage:",
+                                value=syntax(command), inline=False)
+                embed.add_field(name="Command Description:",
+                                value=command.help, inline=False)
                 await ctx.send(embed=embed)
 
             else:
                 await ctx.send("Sorry, but that command does not exist.")
-
-        infolog(f"{ctx.message.author} has executed the command: gbothelp")
 
     @commands.command(help="Displays the ping of gBot.")
     async def ping(self, ctx):
         embed = discord.Embed(title='Pong! :ping_pong:',
                               description=f'The ping of gBot is `{int(self.bot.latency * 1000)}` ms!', colour=discord.Colour.blue())
         await ctx.send(embed=embed)
-        infolog(f"{ctx.message.author} has executed the command: ping")
-    
+
     @gbothelp.error
     async def gbothelp_error(self, ctx, error):
         if isinstance(error, commands.BotMissingPermissions):

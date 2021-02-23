@@ -3,7 +3,7 @@
 import aiosqlite
 import discord
 from discord.ext import commands
-from gServerTools import errorlog, successlog
+from gServerTools import errorlog, infolog, successlog
 
 from lib.conf_importer import version
 
@@ -20,9 +20,13 @@ class MetaCog(commands.Cog):
         if isinstance(error, commands.NotOwner):
             return await ctx.send("Sorry, but this command can only be used by the owner of gBot.")
         if isinstance(error, commands.MissingPermissions):
-            return await ctx.send("Sorry, but you don't have permissions to do that.")
+            errorEmbed = discord.Embed(title=":x: You do not have sufficient permissions!",
+                                       description=f"See the error message below for more details.\n```py\n{error}\n```")
+            return await ctx.send(embed=errorEmbed)
         if isinstance(error, commands.MissingRequiredArgument):
-            return await ctx.send(error)
+            errorEmbed = discord.Embed(title=":x: You are missing required arguments!",
+                                       description=f"See the error message below for more details.\n```py\n{error}\n```")
+            return await ctx.send(embed=errorEmbed)
         if isinstance(error, commands.BotMissingPermissions):
             return
         if isinstance(error, commands.CommandInvokeError):
@@ -32,9 +36,9 @@ class MetaCog(commands.Cog):
                                        colour=discord.Colour.red())
             errorEmbed.add_field(name="** **",
                                  value=f"```py\nAn exception occurred in the command {ctx.command}:\n    └╴{error.__class__.__name__}:\n        └╴{error}```")
-            errorlog(f"An exception occurred in the command {ctx.command}:")
-            errorlog(f"    └╴{error.__class__.__name__}:")
-            errorlog(f"        └╴{error}")
+            await errorlog(f"An exception occurred in the command {ctx.command}:")
+            await errorlog(f"    └╴{error.__class__.__name__}:")
+            await errorlog(f"        └╴{error}")
             return await ctx.send(embed=errorEmbed)
         else:
             errorEmbed = discord.Embed(title=":x: An Error Occurred!",
@@ -42,10 +46,14 @@ class MetaCog(commands.Cog):
                                        colour=discord.Colour.red())
             errorEmbed.add_field(name="** **",
                                  value=f"```py\nAn exception occurred in the command {ctx.command}:\n    └╴{error.__class__.__name__}:\n        └╴{error}```")
-            errorlog(f"An exception occurred in the command {ctx.command}:")
-            errorlog(f"    └╴{error.__class__.__name__}:")
-            errorlog(f"        └╴{error}")
+            await errorlog(f"An exception occurred in the command {ctx.command}:")
+            await errorlog(f"    └╴{error.__class__.__name__}:")
+            await errorlog(f"        └╴{error}")
             return await ctx.send(embed=errorEmbed)
+
+    @commands.Cog.listener()
+    async def on_command_completion(self, ctx):
+        await infolog(f"{ctx.message.author} has executed the command: {ctx.command}.")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):

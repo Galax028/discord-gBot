@@ -6,7 +6,6 @@ from typing import Optional
 import aiofiles
 import discord
 from discord.ext import commands
-from gServerTools import infolog
 
 
 class FunCog(commands.Cog):
@@ -26,30 +25,27 @@ class FunCog(commands.Cog):
         embed.add_field(
             name=f'Question: {question}', value=f'Answer: {random.choice(responses)}')
         await ctx.send(embed=embed)
-        infolog(f"{ctx.message.author} has executed the command: _8ball")
 
     @commands.command(aliases=["tc", "toss", "coin"], help="Guess if it's head or tails.")
     async def tosscoin(self, ctx, *, guess):
         responses = ['It is head!', 'It is tails!']
         embed = discord.Embed(title='Toss a Coin!',
                               colour=discord.Colour.gold())
-        embed.add_field(name=f'Your guess: {guess}', value=f'Result: {random.choice(responses)}')
+        embed.add_field(
+            name=f'Your guess: {guess}', value=f'Result: {random.choice(responses)}')
         await ctx.send(embed=embed)
-        infolog(f"{ctx.message.author} has executed the command: tosscoin")
 
     @commands.command(help="gBot will send a random picture of space.")
     async def space(self, ctx):
-        async with aiofiles.open("Python/discord-gBot/data/space_pictures.txt", "r") as f:
+        async with aiofiles.open(f"{self.bot.path}/data/space_pictures.txt", "r") as f:
             responses = await f.readlines()
         await ctx.send('Here you go.')
         await ctx.send(random.choice(responses))
-        infolog(f"{ctx.message.author} has executed the command: space")
 
     @commands.command(aliases=["ka"], help="Ass kicking' time!")
     async def kickass(self, ctx, member: discord.Member):
         responses = list(range(1, 99))
         await ctx.send(f"{ctx.message.author.mention} has kicked {member.mention}'s ass and dealt `{random.choice(responses)}` damage!")
-        infolog(f"{ctx.message.author} has executed the command: kickass")
 
     @commands.command(help="gBot will **try** to kill the user.")
     async def kill(self, ctx, member: discord.Member):
@@ -63,17 +59,29 @@ class FunCog(commands.Cog):
                      f"You know what, nah. You don't pay me enough to do this, {ctx.message.author.mention}. I'm just gonna kill the 2 of you, because why not!    *several gunshots*",
                      f"*gunshots* Oops, I missed all the shots, guess I'll stop being a hitman. By the way, I'm not giving you the refund {ctx.message.author.mention}, it's for the ammo cost."]
         await ctx.send(random.choice(responses))
-        infolog(f"{ctx.message.author} has executed the command: kill")
 
-    @commands.command(aliases=["http", "httpcat"], help="gBot will send a random HTTP error code if not specified.")
+    @commands.command(aliases=["http", "httpcat"], help="gBot will send a random HTTP error cat.")
     async def httpcode(self, ctx, http_code: Optional[int] = None):
-        if not http_code:
-            async with aiofiles.open("Python/discord-gBot/data/http.txt", "r") as f:
-                responses = await f.readlines()
-            await ctx.send(random.choice(responses))
-        else:
-            await ctx.send(f"https://http.cat/{http_code}")
-        infolog(f"{ctx.message.author} has executed the command: httpcode")
+        async with aiofiles.open(f"{self.bot.path}/data/http.txt", "r") as f:
+            responses = await f.readlines()
+        embed = discord.Embed()
+        embed.set_image(url=random.choice(responses))
+        embed.set_footer(text="Images taken from: https://http.cat")
+        await ctx.send(embed = embed)
+
+    @commands.command(help="gBot will generate a random number between 1 and 2,147,483,647 if not specified.")
+    async def randomnum(self, ctx, minnum: Optional[int] = 1, maxnum: Optional[int] = 2147483647):
+        if minnum < 1:
+            return await ctx.send("The minimum number cannot be smaller than 1!")
+        if maxnum > 2147483647:
+            return await ctx.send("The maximum number cannot exceed the 32 bit integer limit!")
+
+        embed = discord.Embed(title="Random Number Generator",
+                              description=f"Minium: {minnum} | Maximum: {maxnum}",
+                              colour=discord.Colour.random())
+        embed.add_field(name="The random number is:",
+                        value=random.randint(minnum, maxnum))
+        await ctx.send(embed=embed)
 
     @_8ball.error
     async def _8ball_error(self, ctx, error):
