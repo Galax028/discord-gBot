@@ -136,7 +136,7 @@ class OwnerCog(commands.Cog):
         if os.name == "nt":
             subprocess.Popen(["py", f"{self.bot.path}/update_wait.py"])
         else:
-            subprocess.Popen(["bash", "#!bin/bash", "python3", f"{self.bot.path}/update_wait.py", "&"])
+            subprocess.Popen(["bash", "#!bin/bash", f"python3 {self.bot.path}/updater.bash", "&"])
         await ctx.send("Logging Out...")
         await infolog(f"gBot has been shutted down.")
         await self.bot.logout()
@@ -147,7 +147,7 @@ class OwnerCog(commands.Cog):
     @panel.command()
     async def shutdown(self, ctx):
         await ctx.send("Are you sure you want to shutdown?(`y/n`,`10s timeout`):")
-        msg = await self.bot.wait_for('message', timeout=10 ,check=lambda message: message.author == ctx.author)
+        msg = await self.bot.wait_for('message', timeout=10, check=lambda message: message.author == ctx.author)
         if msg.content.lower() == "y":
             await ctx.send("Logging Out...")
             await ctx.send("It is now safe to kill the terminal.")

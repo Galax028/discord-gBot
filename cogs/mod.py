@@ -28,6 +28,20 @@ def generate_captcha_content():
     return captcha_content
 
 
+async def verification_channel_check(self, ctx):
+    async with aiosqlite.connect(self.dbpath) as db:
+        async with db.execute("""SELECT captcha_channel_id FROM guild_config WHERE guild_id=?""", (ctx.guild.id,)) as cursor:
+            captcha_channel = await cursor.fetchone()
+            try:
+                if ctx.channel.id == int(captcha_channel[0]):
+                    if str(ctx.command) != "verify":
+                        await ctx.message.delete()
+                        await ctx.send("You need to verify yourself to use this command.", delete_after=1)
+                        raise commands.CommandNotFound()
+            except TypeError:
+                pass
+
+
 class ModCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -45,16 +59,18 @@ class ModCog(commands.Cog):
             pass
 
     @commands.command(aliases=["purge", "cls", "delete", "remove"], help="gBot will clear messages.")
+    @commands.before_invoke(verification_channel_check)
     @commands.has_permissions(manage_messages=True)
     async def clear(self, ctx, amount: int, member: commands.MemberConverter = None):
         if member:
             await ctx.channel.purge(limit=amount + 1, check=lambda message: message.author.id == member.id)
-            await ctx.send(f"Cleared `{amount - 1}` messages from {member.name}.", delete_after=1)
+            await ctx.send(f"Cleared `{amount}` messages from {member.name}.", delete_after=1)
         else:
             await ctx.channel.purge(limit=amount + 1)
-            await ctx.send(f"Cleared `{amount - 1}` messages.", delete_after=1)
+            await ctx.send(f"Cleared `{amount}` messages.", delete_after=1)
 
     @commands.command(help="gBot will mute a user.")
+    @commands.before_invoke(verification_channel_check)
     @commands.has_permissions(kick_members=True)
     async def mute(self, ctx, member: commands.MemberConverter, *, reason: Optional[str] = None):
         role = discord.utils.get(ctx.guild.roles, name="Muted")
@@ -69,6 +85,7 @@ class ModCog(commands.Cog):
         await ctx.send(f'{member.mention} has been muted. Reason: {reason}')
 
     @commands.command(help="gBot will unmute a user.")
+    @commands.before_invoke(verification_channel_check)
     @commands.has_permissions(kick_members=True)
     async def unmute(self, ctx, member: commands.MemberConverter):
         role = discord.utils.get(ctx.guild.roles, name='Muted')
@@ -76,18 +93,21 @@ class ModCog(commands.Cog):
         await ctx.send(f'{member.mention} has been unmuted.')
 
     @commands.command(help="gBot will kick a user.")
+    @commands.before_invoke(verification_channel_check)
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: commands.MemberConverter, *, reason: Optional[str] = None):
         await member.kick(reason=reason)
         await ctx.send(f'{member.mention} has beed kicked. Reason: {reason}')
 
     @commands.command(help="gBot will ban a user.")
+    @commands.before_invoke(verification_channel_check)
     @commands.has_permissions(ban_members=True)
     async def ban(self, ctx, member: commands.MemberConverter, *, reason: Optional[str] = None):
         await member.ban(reason=reason)
         await ctx.send(f'{member.mention} has beed banned. Reason: {reason}')
 
     @commands.command(help="gBot will unban a user.")
+    @commands.before_invoke(verification_channel_check)
     @commands.has_permissions(ban_members=True)
     async def unban(self, ctx, *, member):
         banned_users = await ctx.guild.bans()

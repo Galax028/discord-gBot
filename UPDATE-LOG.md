@@ -14,19 +14,20 @@ Or if you have fixes or updates, create a pull request.
 # Update Logs
 -------------
 
-## Version 1.4.1 [Version Rework]
---------------------------------
-This update has changed how versions function. The first number indicates an enormous update, for example a whole new system.
-The second number indicates normal updates, bug fixes, etc,. Finally, the last number indicates miscellaneous fixes and updates.
-    
-This version also has a couple bug fixes. Removed some hard coding, and refactoring some code.
+## Version 1.4.0
+----------------
 
-## Version 1.4.2 [Paginator Fix]
--------------------------------
-gBot's pagination system is now fixed. From now on, if a user changes a page, other users' page will not be changed.
-This fix is implemented by using dictionaries on different variables of the paginator class.
-   
-This version also fixed a couple of grammar and spelling mistakes.
+> ### Version 1.4.1 [Version Rework]
+> --------------------------------
+> This update has changed how versions function. The first number indicates an enormous update, for example a whole new system. The second number indicates normal updates, bug fixes, etc,. Finally, the last number indicates miscellaneous fixes and updates.
+>
+> This version also has a couple bug fixes. Removed some hard coding, and refactoring some code.
+
+> ### Version 1.4.2
+> ----------------
+> gBot's pagination system is now fixed. From now on, if a user changes a page, other users' page will not be changed.This fix is implemented by using dictionaries on different variables of the paginator class.
+>
+> This version also fixed a couple of grammar and spelling mistakes.
 
 ## Version 1.5.0 [Custom Server Prefix]
 ---------------------------------------
@@ -45,6 +46,22 @@ Side note: We might have a new developer to work on gBot pretty soon. He is curr
 This version introduces the new captcha system! New commands are `setverificationchannel`, `verificationchannel`, and verify. `setverificationchannel` will setup the captcha system for the server. It will restrict the @everyone role so that unverified people cant access other channels other than the verification channel. The bot will also create a role called "Verified" for verified people. *Do not change the name of the verified role, if you change it the captcha system will create another "Verified" role.* `verificationchannel` will tell the user which channel is used for verification. `verify` can only be used in a verification channel. The bot will send a captcha with random uppercase characters and numbers. If you succeed, you will get the "Verified" role.
 
 Bugs not fixed: `panel updater` doesn't really execute the update_wait.py script in linux. I'm having problems with bash.
+
+> ### Version 1.7.1
+> -----------------
+> This version just bring small bug fixes to the verification system. You cannot use other commands in a verification channel.
+
+> ### Version 1.7.2
+> -----------------
+> I just cleaned up the `clear` command and made it better.
+
+> ### Version 1.7.3
+> -----------------
+> Remade the `ping` command. It now shows the websocket, typing, and database latency.
+
+## Version 1.8.0 [Anime]
+------------------------
+New cog this update, `AnimeCog`. It brings 4 commands in total. They are `waifu`, `waifu categories`, `waifu sfw`, and `waifu nsfw`. Thanks to [waifu.pics](https://waifu.pics), fetching anime pictures are made very easy using it's API and `aiohttp`. I recommend finding out about these commands by yourself ( ͡° ͜ʖ ͡°). 
 
 ---
 

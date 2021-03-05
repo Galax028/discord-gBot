@@ -27,6 +27,10 @@ class MetaCog(commands.Cog):
             errorEmbed = discord.Embed(title=":x: You are missing required arguments!",
                                        description=f"See the error message below for more details.\n```py\n{error}\n```")
             return await ctx.send(embed=errorEmbed)
+        if isinstance(error, commands.CommandOnCooldown):
+            return await ctx.send("Woah, slow down! This command is on cooldown.")
+        if isinstance(error, commands.NSFWChannelRequired):
+            return await ctx.send("Sorry, but this command can only be used in NSFW channels.")
         if isinstance(error, commands.BotMissingPermissions):
             return
         if isinstance(error, commands.CommandInvokeError):

@@ -1,5 +1,3 @@
-# pylint: disable=import-error, no-name-in-module
-
 import asyncio
 import os
 import sqlite3
@@ -9,7 +7,7 @@ from pathlib import Path
 import aiosqlite
 import discord
 from discord.ext import commands
-from gServerTools import criticallog, infolog, successlog
+from gServerTools import criticallog, infolog, successlog, warnlog
 
 from lib.conf_importer import token, version
 
@@ -96,9 +94,11 @@ class gBot(commands.Bot):
                 sys.exit(1)
         await successlog("SETUP:     └╴Sqlite database check completed.")
 
+    async def on_connect(self):
+        await successlog("SETUP:     └╴Connected to Discord API. Readying up...")
+
     async def on_ready(self):
-        await successlog("SETUP:     └╴Connected to Discord API.")
-        await infolog("gBot is now online.")
+        await infolog("SETUP:        └╴Readied up. Setup completed.")
 
     async def get_prefix(self, message):
         guild_id = message.guild.id
@@ -115,6 +115,17 @@ class gBot(commands.Bot):
 
 if __name__ == "__main__":
     os.system("")
+
+    try:
+        import uvloop
+    except ImportError:
+        asyncio.run(warnlog("Uvloop not detected. Defaulting to normal AsyncIO event loop."))
+        asyncio.set_event_loop(asyncio.new_event_loop())
+    else:
+        asyncio.run(successlog("Uvloop detected. Initiating Uvloop..."))
+        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+        asyncio.run(successlog("    └╴Event loop is now set as Uvloop."))
+
     bot = gBot(token=token,
                dbpath=f"{Path(__file__).parent.absolute()}/data/bot.db",
                load_cogs=True,

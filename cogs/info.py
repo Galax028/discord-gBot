@@ -13,13 +13,15 @@ import discord
 from discord import __version__ as discord_version
 from discord.ext import commands
 from discord.utils import get
-from lib.conf_importer import prebuild, token, version
-from lib.paginator import Paginator
 from psutil import Process, virtual_memory
 
+from cogs.anime import AnimeCog
 from cogs.config import ConfigCog
 from cogs.fun import FunCog
 from cogs.mod import ModCog
+import lib.utils as utils
+from lib.conf_importer import prebuild, token, version
+from lib.paginator import Paginator
 
 
 def syntax(command):
@@ -47,6 +49,20 @@ def help_embed(page, cog_name):
     return page
 
 
+async def verification_channel_check(self, ctx):
+    async with aiosqlite.connect(self.dbpath) as db:
+        async with db.execute("""SELECT captcha_channel_id FROM guild_config WHERE guild_id=?""", (ctx.guild.id,)) as cursor:
+            captcha_channel = await cursor.fetchone()
+            try:
+                if ctx.channel.id == int(captcha_channel[0]):
+                    if str(ctx.command) != "verify":
+                        await ctx.message.delete()
+                        await ctx.send("You need to verify yourself to use this command.", delete_after=1)
+                        raise commands.CommandNotFound()
+            except TypeError:
+                pass
+
+
 class InfoCog(commands.Cog):
 
     def __init__(self, bot):
@@ -54,6 +70,7 @@ class InfoCog(commands.Cog):
         self.dbpath = self.bot.dbpath
 
     @commands.command(help="Displays information about gBot.")
+    @commands.before_invoke(verification_channel_check)
     async def gbotinfo(self, ctx):
         embed = discord.Embed(title='About gBot',
                               colour=discord.Colour.blurple())
@@ -92,8 +109,9 @@ class InfoCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(help="Displays the gbot help page or displays help of a specific command.")
+    @commands.before_invoke(verification_channel_check)
     @commands.bot_has_permissions(manage_messages=True)
-    async def gbothelp(self, ctx, cmd: Optional[str]):
+    async def gbothelp(self, ctx, *, cmd: Optional[str]):
         if cmd is None:
             async with aiosqlite.connect(self.dbpath) as db:
                 async with db.execute("""SELECT pagination FROM guild_config WHERE guild_id=?""", (ctx.guild.id,)) as cursor:
@@ -102,20 +120,22 @@ class InfoCog(commands.Cog):
                         raise commands.BotMissingPermissions("Guild's pagination mode is manual.")
 
             contents = discord.Embed(title='gbothelp - Contents',
-                                     description='Info Commands - Page 1\nFun Commands - Page 2\nModeration Commands - Page 3\nConfiguration Commands - Page 4',
+                                     description='Info Commands - Page 1\nFun Commands - Page 2\nAnime Commands - Page 3\nModeration Commands - Page 4\nConfiguration Commands - Page 5',
                                      colour=discord.Colour.blurple())
             page1 = discord.Embed(title='gbothelp - Info Commands',
-                                  description=' ', colour=discord.Colour.blurple())
+                                  colour=discord.Colour.blurple())
             page2 = discord.Embed(title='gbothelp - Fun Commands',
-                                  description=' ', colour=discord.Colour.blurple())
-            page3 = discord.Embed(title='gbothelp - Moderation Commands',
-                                  description=' ', colour=discord.Colour.blurple())
-            page4 = discord.Embed(title='gbothelp - Configuration Commands',
-                                  description=' ', colour=discord.Colour.blurple())
+                                  colour=discord.Colour.blurple())
+            page3 = discord.Embed(title='gbothelp - Anime Commands',
+                                  colour=discord.Colour.blurple())
+            page4 = discord.Embed(title='gbothelp - Moderation Commands',
+                                  colour=discord.Colour.blurple())
+            page5 = discord.Embed(title='gbothelp - Configuration Commands',
+                                  colour=discord.Colour.blurple())
 
             p = Paginator(bot=self.bot,
                           contents=[contents, help_embed(page1, InfoCog), help_embed(
-                              page2, FunCog), help_embed(page3, ModCog), help_embed(page4, ConfigCog)],
+                              page2, FunCog), help_embed(page3, AnimeCog), help_embed(page4, ModCog), help_embed(page5, ConfigCog)],
                           pages=5,
                           ctx=ctx,
                           user_id=ctx.author.id)
@@ -135,29 +155,45 @@ class InfoCog(commands.Cog):
                 await ctx.send("Sorry, but that command does not exist.")
 
     @commands.command(help="Displays the ping of gBot.")
+    @commands.before_invoke(verification_channel_check)
     async def ping(self, ctx):
-        embed = discord.Embed(title='Pong! :ping_pong:',
-                              description=f'The ping of gBot is `{int(self.bot.latency * 1000)}` ms!', colour=discord.Colour.blue())
+        async def db_pinger(ctx):
+            async with aiosqlite.connect(self.dbpath) as db:
+                async with db.execute("""SELECT * FROM guild_config WHERE guild_id=?""", (ctx.guild.id,)) as cursor:
+                    await cursor.fetchall()
+        db_ping = await utils.timer(db_pinger(ctx))
+
+        typing_ping = await utils.timer(ctx.send(":ping_pong: Pinging...", delete_after=0.1))
+
+        embed = discord.Embed(title=":ping_pong: Pong!")
+        embed.add_field(name=":electric_plug: Websocket Latency:",
+                        value=f"`{(self.bot.latency * 1000):.2f} ms`", inline=False)
+        embed.add_field(name=":keyboard: Typing Latency:",
+                        value=f"`{typing_ping:.2f} ms`", inline=False)
+        embed.add_field(name="<:database:815449617947688972> Database Latency:",
+                        value=f"`{db_ping:.2f} ms`", inline=False)
         await ctx.send(embed=embed)
 
     @gbothelp.error
     async def gbothelp_error(self, ctx, error):
         if isinstance(error, commands.BotMissingPermissions):
             contents = discord.Embed(title='gbothelp - Contents',
-                                     description='Info Commands - Page 1\nFun Commands - Page 2\nModeration Commands - Page 3\nConfiguration Commands - Page 4',
+                                     description='Info Commands - Page 1\nFun Commands - Page 2\nAnime Commands - Page 3\nModeration Commands - Page 4\nConfiguration Commands - Page 5',
                                      colour=discord.Colour.blurple())
             page1 = discord.Embed(title='gbothelp - Info Commands',
-                                  description=' ', colour=discord.Colour.blurple())
+                                  colour=discord.Colour.blurple())
             page2 = discord.Embed(title='gbothelp - Fun Commands',
-                                  description=' ', colour=discord.Colour.blurple())
-            page3 = discord.Embed(title='gbothelp - Moderation Commands',
-                                  description=' ', colour=discord.Colour.blurple())
-            page4 = discord.Embed(title='gbothelp - Configuration Commands',
-                                  description=' ', colour=discord.Colour.blurple())
+                                  colour=discord.Colour.blurple())
+            page3 = discord.Embed(title='gbothelp - Anime Commands',
+                                  colour=discord.Colour.blurple())
+            page4 = discord.Embed(title='gbothelp - Moderation Commands',
+                                  colour=discord.Colour.blurple())
+            page5 = discord.Embed(title='gbothelp - Configuration Commands',
+                                  colour=discord.Colour.blurple())
 
             p = Paginator(bot=self.bot,
                           contents=[contents, help_embed(page1, InfoCog), help_embed(
-                              page2, FunCog), help_embed(page3, ModCog), help_embed(page4, ConfigCog)],
+                              page2, FunCog), help_embed(page3, AnimeCog), help_embed(page4, ModCog), help_embed(page5, ConfigCog)],
                           pages=5,
                           ctx=ctx,
                           user_id=ctx.author.id)
