@@ -68,42 +68,58 @@ class ConfigCog(commands.Cog):
             await db.commit()
             await ctx.send(f"Verification channel successfully changed to <#{verification_channel.id}>.")
         perms = discord.Permissions()
-        perms.update(view_channel=True,
-                     change_nickname=True,
-                     send_messages=True,
-                     embed_links=True,
-                     attach_files=True,
-                     add_reactions=True,
-                     use_external_emojis=True,
-                     read_message_history=True,
-                     use_slash_commands=True,
-                     connect=True,
-                     speak=True,
-                     stream=True,
-                     use_voice_activation=True,
-                     read_messages=True)
+        perms.update(
+            view_channel=True,
+            change_nickname=True,
+            send_messages=True,
+            embed_links=True,
+            attach_files=True,
+            add_reactions=True,
+            use_external_emojis=True,
+            read_message_history=True,
+            use_slash_commands=True,
+            connect=True,
+            speak=True,
+            stream=True,
+            use_voice_activation=True,
+            read_messages=True
+        )
         verified_role = discord.utils.get(ctx.guild.roles, name="Verified")
         if not verified_role:
-            await (await ctx.guild.create_role(name="Verified")).edit(permissions=perms)
+            await (
+                await ctx.guild.create_role(name="Verified")
+            ).edit(permissions=perms)
             verified_role = discord.utils.get(ctx.guild.roles, name="Verified")
-        overwrites = {
-            ctx.guild.default_role: discord.PermissionOverwrite(
-                view_channel=False),
-            verified_role: discord.PermissionOverwrite(
-                view_channel=True)
-        }
+
         for channel in ctx.guild.channels:
             if channel.id == verification_channel.id:
-                await channel.edit(overwrites={ctx.guild.default_role: discord.PermissionOverwrite(view_channel=True),
-                                               verified_role: discord.PermissionOverwrite(view_channel=False)})
+                await channel.edit(overwrites={
+                    ctx.guild.default_role: discord.PermissionOverwrite(
+                        view_channel=True
+                    ),
+                    verified_role: discord.PermissionOverwrite(
+                        view_channel=False
+                    )
+                })
+                embed = discord.Embed(
+                    title=f"Welcome to ***{ctx.guild.name}***!",
+                    description="Please verify yourself to get access to the rest of the server.",
+                    color=discord.Colour.blurple()
+                )
+                embed.add_field(
+                    name="How to verify:",
+                    value=f"Just type `{await self.bot.get_prefix(ctx.message)}verify`, then wait for te bot to send the captcha. After that, complete the captcha and you will be verified!"
+                )
+                await channel.send(embed=embed)
             else:
-                await channel.edit(overwrites=overwrites)
-        embed = discord.Embed(title=f"Welcome to ***{ctx.guild.name}***!",
-                              description="Please verify yourself to get access to the rest of the server.",
-                              color=discord.Colour.blurple())
-        embed.add_field(name="How to verify:",
-                        value=f"Just type `{await self.bot.get_prefix(ctx.message)}verify`, then wait for te bot to send the captcha. After that, complete the captcha and you will be verified!")
-        await channel.send(embed=embed)
+                await channel.edit(overwrites={
+                    ctx.guild.default_role: discord.PermissionOverwrite(
+                        view_channel=False
+                    ),
+                    verified_role: discord.PermissionOverwrite(
+                        view_channel=True
+                    )
+                })
 
     @commands.command(help="see gBot's verification channel for this server.")
     @commands.before_invoke(verification_channel_check)

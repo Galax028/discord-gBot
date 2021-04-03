@@ -35,15 +35,21 @@ class AnimeCog(commands.Cog):
     @commands.before_invoke(verification_channel_check)
     async def waifu(self, ctx):
         if ctx.invoked_subcommand is None:
-            async with aiohttp.ClientSession() as cs:
-                waifu_picture = (await (await cs.get(f"https://waifu.pics/api/sfw/{random.choice(self.sfw_categories)}")).json())
+            waifu_picture = (
+                await (
+                    await self.bot.cs.get(
+                        f"https://waifu.pics/api/sfw/{random.choice(self.sfw_categories)}"
+                    )
+                ).json()
+            )
 
-                embed = discord.Embed(title="Here you go!")
-                embed.set_author(name=f"To see all the categories, type \"{await self.bot.get_prefix(ctx.message)}waifu categories\".")
-                embed.set_image(url=waifu_picture["url"])
-                embed.set_footer(text="Thanks to waifu.pics for these amazing pictures!")
+            embed = discord.Embed(title="Here you go!")
+            embed.set_author(name=f"To see all the categories, type \"{await self.bot.get_prefix(ctx.message)}waifu categories\".")
+            embed.set_image(url=waifu_picture["url"])
+            embed.set_footer(
+                text="Thanks to waifu.pics for these amazing pictures!")
 
-                await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @waifu.command(help="List all of the waifu pictures categories.")
     @commands.cooldown(rate=1, per=5, type=commands.cooldowns.BucketType.user)
@@ -52,70 +58,97 @@ class AnimeCog(commands.Cog):
         sfw = ""
         nsfw = ""
 
-        for i in range(len(self.sfw_categories)):
-            sfw += f"{self.sfw_categories[i]}\n"
-        for j in range(len(self.nsfw_categories)):
-            nsfw += f"{self.nsfw_categories[i]}\n"
+        for i in self.sfw_categories:
+            sfw += f"{i}\n"
+        for j in self.nsfw_categories:
+            nsfw += f"""{"||" if j == "blowjob" else ""}{j}{"||" if j == "blowjob" else ""}\n"""
 
         embed = discord.Embed(title="Waifu Categories")
         embed.add_field(name="SFW Categories:", value=sfw)
         embed.add_field(name="NSFW Categories:", value=nsfw)
-        embed.set_footer(text="Note: NSFW Categories can only be used in nsfw channels.")
+        embed.set_footer(
+            text="Note: NSFW Categories can only be used in nsfw channels.")
 
         await ctx.send(embed=embed)
-    
+
     @waifu.command(help="Sends a random SFW waifu picture if a category is not provided.")
     @commands.cooldown(rate=1, per=5, type=commands.cooldowns.BucketType.user)
     @commands.before_invoke(verification_channel_check)
     async def sfw(self, ctx, category: Optional[str] = None):
         if not category:
-            async with aiohttp.ClientSession() as cs:
-                waifu_picture = (await (await cs.get(f"https://waifu.pics/api/sfw/{random.choice(self.sfw_categories)}")).json())
+            waifu_picture = (
+                await (
+                    await self.bot.cs.get(
+                        f"https://waifu.pics/api/sfw/{random.choice(self.sfw_categories)}"
+                    )
+                ).json()
+            )
 
-                embed = discord.Embed(title="Here you go!")
-                embed.set_image(url=waifu_picture["url"])
-                embed.set_footer(text="Thanks to waifu.pics for these amazing pictures!")
+            embed = discord.Embed(title="Here you go!")
+            embed.set_image(url=waifu_picture["url"])
+            embed.set_footer(text="Pictures by https://waifu.pics")
 
-                return await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
         if category.lower() not in self.sfw_categories:
             return await ctx.send(f"`{category.lower()}` is not a valid category! Use `{await self.bot.get_prefix(ctx.message)}waifu categories` to see all avaliable categories.")
 
-        async with aiohttp.ClientSession() as cs:
-            waifu_picture = (await (await cs.get(f"https://waifu.pics/api/sfw/{category.lower()}")).json())
+        waifu_picture = (
+            await (
+                await self.bot.cs.get(
+                    f"https://waifu.pics/api/sfw/{category.lower()}"
+                )
+            ).json()
+        )
 
-            embed = discord.Embed(title="Here you go!", description=f"Category: {category.lower()}")
-            embed.set_image(url=waifu_picture["url"])
-            embed.set_footer(text="Thanks to waifu.pics for these amazing pictures!")
+        embed = discord.Embed(
+            title="Here you go!",
+            description=f"Category: {category.lower()}"
+        )
+        embed.set_image(url=waifu_picture["url"])
+        embed.set_footer(text="Pictures by https://waifu.pics")
 
-            return await ctx.send(embed=embed)
-    
+        return await ctx.send(embed=embed)
+
     @waifu.command(help="Sends a random NSFW waifu picture if a category is not provided. This command can only be used in NSFW channels.")
     @commands.is_nsfw()
     @commands.cooldown(rate=1, per=5, type=commands.cooldowns.BucketType.user)
     @commands.before_invoke(verification_channel_check)
     async def nsfw(self, ctx, category: Optional[str] = None):
         if not category:
-            async with aiohttp.ClientSession() as cs:
-                waifu_picture = (await (await cs.get(f"https://waifu.pics/api/nsfw/{random.choice(self.nsfw_categories)}")).json())
+            waifu_picture = (
+                await (
+                    await self.bot.cs.get(
+                        f"https://waifu.pics/api/nsfw/{random.choice(self.nsfw_categories)}"
+                    )
+                ).json()
+            )
 
-                embed = discord.Embed(title="Here you go!")
-                embed.set_image(url=waifu_picture["url"])
-                embed.set_footer(text="Thanks to waifu.pics for these amazing pictures!")
+            embed = discord.Embed(title="Here you go!")
+            embed.set_image(url=waifu_picture["url"])
+            embed.set_footer(text="Pictures by https://waifu.pics")
 
-                return await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
         if category.lower() not in self.nsfw_categories:
             return await ctx.send(f"`{category.lower()}` is not a valid category! Use `{await self.bot.get_prefix(ctx.message)}waifu categories` to see all avaliable categories.")
 
-        async with aiohttp.ClientSession() as cs:
-            waifu_picture = (await (await cs.get(f"https://waifu.pics/api/nsfw/{category.lower()}")).json())
+        waifu_picture = (
+            await (
+                await self.bot.cs.get(
+                    f"https://waifu.pics/api/nsfw/{category.lower()}"
+                )
+            ).json()
+        )
 
-            embed = discord.Embed(title="Here you go!", description=f"Category: {category.lower()}")
-            embed.set_image(url=waifu_picture["url"])
-            embed.set_footer(text="Thanks to waifu.pics for these amazing pictures!")
+        embed = discord.Embed(
+            title="Here you go!",
+            description=f"Category: {category.lower()}"
+        )
+        embed.set_image(url=waifu_picture["url"])
+        embed.set_footer(text="Pictures by https://waifu.pics")
 
-            return await ctx.send(embed=embed)
+        return await ctx.send(embed=embed)
 
 
 def setup(bot):

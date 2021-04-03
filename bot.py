@@ -4,6 +4,7 @@ import sqlite3
 import sys
 from pathlib import Path
 
+import aiohttp
 import aiosqlite
 import discord
 from discord.ext import commands
@@ -41,12 +42,14 @@ class gBot(commands.Bot):
     """
 
     def __init__(self, **kwargs):
-        super().__init__(command_prefix=self.get_prefix,
-                         help_command=kwargs["help_cmd"],
-                         case_insensitive=True,
-                         intents=discord.Intents.all(),
-                         status=kwargs["status"],
-                         activity=kwargs["activity"])
+        super().__init__(
+            command_prefix=self.get_prefix,
+            help_command=kwargs["help_cmd"],
+            case_insensitive=True,
+            intents=discord.Intents.all(),
+            status=kwargs["status"],
+            activity=kwargs["activity"]
+        )
 
         self.token = kwargs["token"]
         self.dbpath = kwargs["dbpath"]
@@ -55,18 +58,19 @@ class gBot(commands.Bot):
         self.path = Path(__file__).parent.absolute()
 
     def run(self):
-        if self.load_cogs == True:
+        if self.load_cogs:
             self.cogloader()
 
-        if self.jishaku == True:
+        if self.jishaku:
             asyncio.run(infolog("SETUP: Loading Jishaku..."))
             os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
-            os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True" 
+            os.environ["JISHAKU_NO_DM_TRACEBACK"] = "True"
             os.environ["JISHAKU_HIDE"] = "True"
             super().load_extension("jishaku")
             asyncio.run(successlog("SETUP:     └╴Jishaku has been loaded."))
 
         asyncio.run(self.dbloader())
+
         asyncio.run(infolog("SETUP: Connecting to Discord API..."))
         super().run(self.token)
 
@@ -98,7 +102,10 @@ class gBot(commands.Bot):
         await successlog("SETUP:     └╴Connected to Discord API. Readying up...")
 
     async def on_ready(self):
-        await infolog("SETUP:        └╴Readied up. Setup completed.")
+        await infolog("SETUP:        └╴Readied up.")
+        await infolog("Starting AioHTTP client session...")
+        self.cs = aiohttp.ClientSession()
+        await successlog("    └╴AioHTTP client session started. Setup completed.")
 
     async def get_prefix(self, message):
         guild_id = message.guild.id
@@ -108,29 +115,22 @@ class gBot(commands.Bot):
                     prefix = await cursor.fetchone()
                     return prefix[0]
             except TypeError:
-                await db.execute("""INSERT INTO guild_config (guild_id, prefix) VALUES (?, ?)""", (guild_id, "/"))
+                await db.execute(
+                    """INSERT INTO guild_config (guild_id, prefix, pagination, captcha_channel_id)
+                       VALUES (?, ?, ?, ?)""", (guild_id, "/", "auto", 0)
+                )
                 await db.commit()
                 return "/"
 
 
 if __name__ == "__main__":
-    os.system("")
-
-    try:
-        import uvloop
-    except ImportError:
-        asyncio.run(warnlog("Uvloop not detected. Defaulting to normal AsyncIO event loop."))
-        asyncio.set_event_loop(asyncio.new_event_loop())
-    else:
-        asyncio.run(successlog("Uvloop detected. Initiating Uvloop..."))
-        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-        asyncio.run(successlog("    └╴Event loop is now set as Uvloop."))
-
-    bot = gBot(token=token,
-               dbpath=f"{Path(__file__).parent.absolute()}/data/bot.db",
-               load_cogs=True,
-               jishaku=True,
-               help_cmd=None,
-               status=discord.Status.online,
-               activity=discord.Game(f'/gbothelp | v.{version}'))
+    bot = gBot(
+        token=token,
+        dbpath=f"{Path(__file__).parent.absolute()}/data/bot.db",
+        load_cogs=True,
+        jishaku=True,
+        help_cmd=None,
+        status=discord.Status.online,
+        activity=discord.Game(f'/gbothelp | v.{version}')
+    )
     bot.run()

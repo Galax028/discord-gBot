@@ -47,23 +47,15 @@ class ModCog(commands.Cog):
         self.bot = bot
         self.dbpath = self.bot.dbpath
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.guild.id == 786180842862018570:
-            bad = ["language", "lαnguage", "ianguage"]
-            for word in bad:
-                if word in message.content.lower():
-                    await message.delete()
-                    await message.channel.send("Oi mate the l-word is restricted here")
-        else:
-            pass
-
     @commands.command(aliases=["purge", "cls", "delete", "remove"], help="gBot will clear messages.")
     @commands.before_invoke(verification_channel_check)
     @commands.has_permissions(manage_messages=True)
     async def clear(self, ctx, amount: int, member: commands.MemberConverter = None):
         if member:
-            await ctx.channel.purge(limit=amount + 1, check=lambda message: message.author.id == member.id)
+            await ctx.channel.purge(
+                limit=amount,
+                check=lambda message: message.author.id == member.id
+            )
             await ctx.send(f"Cleared `{amount}` messages from {member.name}.", delete_after=1)
         else:
             await ctx.channel.purge(limit=amount + 1)
@@ -75,8 +67,11 @@ class ModCog(commands.Cog):
     async def mute(self, ctx, member: commands.MemberConverter, *, reason: Optional[str] = None):
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         perms = discord.Permissions()
-        perms.update(send_messages=False,
-                     read_message_history=True, read_messages=True)
+        perms.update(
+            send_messages=False,
+            read_message_history=True,
+            read_messages=True
+        )
         if not role:
             muted = await ctx.guild.create_role(name="Muted", reason=None)
             await muted.edit(permissions=perms)
@@ -142,7 +137,11 @@ class ModCog(commands.Cog):
 
         msg = await ctx.send(file=captcha_img, embed=embed)
         try:
-            captcha_check = await self.bot.wait_for("message", timeout=20, check=lambda message: message.author == ctx.author)
+            captcha_check = await self.bot.wait_for(
+                "message",
+                timeout=20,
+                check=lambda message: message.author == ctx.author
+            )
             if captcha_check.content == captcha_content[user_id]:
                 os.remove(f"{self.bot.path}/data/captcha-{user_id}.png")
                 captcha_content.pop(user_id)
